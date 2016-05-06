@@ -51,6 +51,8 @@ namespace EMC.SPaaS.Manager
 
             app.UseApplicationInsightsExceptionTelemetry();
 
+            app.UseDefaultFiles();
+
             app.UseStaticFiles();
 
             app.UseMvc();
