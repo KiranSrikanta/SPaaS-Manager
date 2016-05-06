@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
+using EMC.SPaaS.ProvisioningEngine;
 
 namespace EMC.SPaaS.Manager.Controllers
 {
@@ -13,6 +14,9 @@ namespace EMC.SPaaS.Manager.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
+            //TODO: PASS IN LOGGED IN USER'S SUBSCRIPTION!
+            var Provisioner = new ProvisionerFactory().CreateProvisioner("Azure");
+            
             return new string[] { "value1", "value2" };
         }
 
