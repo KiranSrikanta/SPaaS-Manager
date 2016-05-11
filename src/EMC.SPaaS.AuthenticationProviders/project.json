@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0-*",
+  "description": "EMC.SPaaS.AuthenticationProviders Class Library",
+  "authors": [ "srikak" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "net451": { }
+  },
+  "dependencies": {
+    "JWT": "1.3.4",
+    "Newtonsoft.Json": "7.0.1"
+  }
+}

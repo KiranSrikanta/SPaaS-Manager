@@ -18,6 +18,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EMC.SPaaS.CloudProvider", "
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EMC.SPaaS.ProvisioningEngine", "src\EMC.SPaaS.ProvisioningEngine\EMC.SPaaS.ProvisioningEngine.xproj", "{E6084F68-3E16-4DF5-A97E-E3402BF19907}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EMC.SPaaS.AuthenticationProviders", "src\EMC.SPaaS.AuthenticationProviders\EMC.SPaaS.AuthenticationProviders.xproj", "{27661D68-6E6D-41A5-BD8D-2E53DB95E2D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{E6084F68-3E16-4DF5-A97E-E3402BF19907}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6084F68-3E16-4DF5-A97E-E3402BF19907}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6084F68-3E16-4DF5-A97E-E3402BF19907}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27661D68-6E6D-41A5-BD8D-2E53DB95E2D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27661D68-6E6D-41A5-BD8D-2E53DB95E2D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27661D68-6E6D-41A5-BD8D-2E53DB95E2D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27661D68-6E6D-41A5-BD8D-2E53DB95E2D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -49,5 +55,6 @@ Global
 		{AD06439D-7F5E-458D-AB15-1D691A541065} = {79C34571-30E6-4B95-9173-BB0CAAD2A067}
 		{49F9DF52-2318-4B1D-9580-F23EEB255C31} = {79C34571-30E6-4B95-9173-BB0CAAD2A067}
 		{E6084F68-3E16-4DF5-A97E-E3402BF19907} = {79C34571-30E6-4B95-9173-BB0CAAD2A067}
+		{27661D68-6E6D-41A5-BD8D-2E53DB95E2D4} = {79C34571-30E6-4B95-9173-BB0CAAD2A067}
 	EndGlobalSection
 EndGlobal

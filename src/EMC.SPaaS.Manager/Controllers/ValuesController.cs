@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using EMC.SPaaS.ProvisioningEngine;
+using Microsoft.AspNet.Authorization;
 
 namespace EMC.SPaaS.Manager.Controllers
 {
@@ -20,6 +21,7 @@ namespace EMC.SPaaS.Manager.Controllers
             return new string[] { "value1", "value2" };
         }
 
+        [Authorize]
         // GET api/values/5
         [HttpGet("{id}")]
         public string Get(int id)

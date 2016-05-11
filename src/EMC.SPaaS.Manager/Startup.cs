@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+
 namespace EMC.SPaaS.Manager
 {
     public class Startup
@@ -54,6 +55,8 @@ namespace EMC.SPaaS.Manager
             app.UseDefaultFiles();
 
             app.UseStaticFiles();
+
+            app.UseJsonWebTokenAuthorization();
 
             app.UseMvc();
         }
