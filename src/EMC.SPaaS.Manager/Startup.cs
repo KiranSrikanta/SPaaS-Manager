@@ -37,6 +37,10 @@ namespace EMC.SPaaS.Manager
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
 
+            services.AddOptions();
+
+            services.Configure<AuthenticationConfigurations>(Configuration.GetSection("Authentication"));
+
             services.AddMvc();
         }
 

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
-using EMC.SPaaS.AuthenticationProviders;
-using Newtonsoft.Json;
-using System.Runtime.Serialization;
+using Microsoft.Extensions.OptionsModel;
 
 namespace EMC.SPaaS.Manager
 {
@@ -15,25 +12,26 @@ namespace EMC.SPaaS.Manager
     {
         private readonly RequestDelegate _next;
 
-        public JsonWebTokenAuthorization(RequestDelegate next)
+        private readonly string serverSecret;
+
+        public JsonWebTokenAuthorization(RequestDelegate next, IOptions<AuthenticationConfigurations> authSettings)
         {
             _next = next;
+            serverSecret = authSettings.Value.ServerSecret;
         }
 
         public Task Invoke(HttpContext context)
         {
-            //TODO:CONFIGURATION
-            if (context.Request.Headers.ContainsKey("Authorization"))
+            if (context.Request.Headers.ContainsKey(Constants.AuthenticationSession.HtmlHeader))
             {
-                //TODO:CONFIGURATION
-                string authHeader = context.Request.Headers["Authorization"];
+                string authHeader = context.Request.Headers[Constants.AuthenticationSession.HtmlHeader];
                 var authBits = authHeader.Split(' ');
                 if (authBits.Length != 2)
                 {
                     //Debug.WriteLine("[JsonWebTokenAuthorization] Ignoring Bad Authorization Header (count!=2)");
                     return _next(context);
                 }
-                if (!authBits[0].ToLowerInvariant().Equals("bearer"))
+                if (!authBits[0].ToLowerInvariant().Equals(Constants.AuthenticationSession.HeaderStartsWith))
                 {
                     //Debug.WriteLine("[JsonWebTokenAuthorization] Ignoring Bad Authorization Header (type!=bearer)");
                     return _next(context);
@@ -41,16 +39,14 @@ namespace EMC.SPaaS.Manager
 
                 try
                 {
-                    //TODO:CONFIGURATION
-                    var secretKey = "SUPERSECRETKEY";
                     try
                     {
-                        var payload = JWT.JsonWebToken.DecodeToObject(authBits[1], secretKey) as IDictionary<string, object>;
+                        var payload = JWT.JsonWebToken.DecodeToObject(authBits[1], serverSecret) as IDictionary<string, object>;
 
                         List<System.Security.Claims.Claim> claims = new List<System.Security.Claims.Claim>();
-                        claims.Add(new System.Security.Claims.Claim(AuthenticationProperties.UserId, payload[AuthenticationProperties.UserId].ToString()));
-                        claims.Add(new System.Security.Claims.Claim(AuthenticationProperties.UserName, payload[AuthenticationProperties.UserName].ToString()));
-                        context.User.AddIdentity(new System.Security.Claims.ClaimsIdentity(claims, payload[AuthenticationProperties.Provider].ToString()));
+                        claims.Add(new System.Security.Claims.Claim(Constants.AuthenticationSession.Properties.UserId, payload[Constants.AuthenticationSession.Properties.UserId].ToString()));
+                        claims.Add(new System.Security.Claims.Claim(Constants.AuthenticationSession.Properties.UserName, payload[Constants.AuthenticationSession.Properties.UserName].ToString()));
+                        context.User.AddIdentity(new System.Security.Claims.ClaimsIdentity(claims, payload[Constants.AuthenticationSession.Properties.Provider].ToString()));
                     }
                     catch (JWT.SignatureVerificationException)
                     {
@@ -83,12 +79,5 @@ namespace EMC.SPaaS.Manager
         {
             return builder.UseMiddleware<JsonWebTokenAuthorization>();
         }
-    }
-
-    public static class AuthenticationProperties
-    {
-        public const string UserName = "UserName";
-        public const string UserId = "UserId";
-        public const string Provider = "Provider";
     }
 }

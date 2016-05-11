@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using EMC.SPaaS.AuthenticationProviders;
+using Microsoft.Extensions.OptionsModel;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,9 +16,14 @@ namespace EMC.SPaaS.Manager.Controllers
 
         string redirectUri = "http://localhost:27934/api/auth/azure/callback";
 
-        public AuthController() : base()
+        readonly string serverSecret;
+
+        public AuthController(IOptions<AuthenticationConfigurations> authSettings)
         {
-            ProviderFactory = new AuthenticationProviderFactory();
+            OAuthSettingsProvider settingsProvider = new OAuthSettingsProvider(authSettings.Value);
+            ProviderFactory = new AuthenticationProviderFactory(settingsProvider.Settings);
+
+            serverSecret = authSettings.Value.ServerSecret;
         }
 
         #region Routes
@@ -46,17 +52,15 @@ namespace EMC.SPaaS.Manager.Controllers
 
             var authData = new Dictionary<string, object>()
             {
-                { AuthenticationProperties.Provider, token.Provider },
-                { AuthenticationProperties.UserName, token.UserInfo.Name },
-                { AuthenticationProperties.UserId, token.UserInfo.Id }
+                { Constants.AuthenticationSession.Properties.Provider, token.Provider },
+                { Constants.AuthenticationSession.Properties.UserName, token.UserInfo.Name },
+                { Constants.AuthenticationSession.Properties.UserId, token.UserInfo.Id }
             };
 
-            //TODO:CONFIGURATION
-            var secretKey = "SUPERSECRETKEY";
-            string sToken = JWT.JsonWebToken.Encode(authData, secretKey, JWT.JwtHashAlgorithm.HS256);
+            string sToken = JWT.JsonWebToken.Encode(authData, serverSecret, JWT.JwtHashAlgorithm.HS256);
 
-            //TODO:CONFIGURATION
-            Response.Cookies.Append("Authorization", sToken,new Microsoft.AspNet.Http.CookieOptions {
+            Response.Cookies.Append(Constants.AuthenticationSession.CookieKey, sToken, new Microsoft.AspNet.Http.CookieOptions
+            {
                 Expires = DateTime.UtcNow.AddMinutes(5)
             });
         }

@@ -11,25 +11,18 @@ namespace EMC.SPaaS.AuthenticationProviders
 {
     public class AzureAdOAuthProvider : IAuthenticationProvider
     {
-        public string TenantId { get; private set; }
-        public string ClientId { get; private set; }
-        string ClientSecret { get; set; }
-        public string Resource { get; private set; }
+        public AzureOAuthSettings Settings { get; private set; }
 
-        public AzureAdOAuthProvider(string tenantId, string clientId, string clientSecret, string resource)
+        public AzureAdOAuthProvider(AzureOAuthSettings settings)
         {
-            TenantId = tenantId;
-            ClientId = clientId;
-            ClientSecret = clientSecret;
-            Resource = resource;
+            Settings = settings;
         }
 
         public string Name
         {
             get
             {
-                //TODO:CONFIGURATION
-                return "Azure";
+                return AzureConstants.ProviderName;
             }
         }
 
@@ -43,8 +36,7 @@ namespace EMC.SPaaS.AuthenticationProviders
 
         public string GetOAuthUrl(string redirectUrl)
         {
-            //TODO:CONFIGURATION
-            return $"https://login.microsoftonline.com/{TenantId}/oauth2/authorize?client_id={ClientId}&response_type=code&redirect_uri={redirectUrl}";
+            return $"https://login.microsoftonline.com/{Settings.TenantId}/oauth2/authorize?client_id={Settings.ClientId}&response_type=code&redirect_uri={redirectUrl}";
         }
 
         public Token GetToken(string authCode, string redirectUrl)
@@ -54,14 +46,13 @@ namespace EMC.SPaaS.AuthenticationProviders
             {
                 var values = new NameValueCollection();
                 values["grant_type"] = "authorization_code";
-                values["client_id"] = ClientId;
-                values["client_secret"] = ClientSecret;
+                values["client_id"] = Settings.ClientId;
+                values["client_secret"] = Settings.ClientSecret;
                 values["code"] = authCode;
                 values["redirect_uri"] = redirectUrl;
-                values["resource"] = Resource;
+                values["resource"] = Settings.Resource;
 
-                //TODO:CONFIGURATION
-                var response = client.UploadValues($"https://login.microsoftonline.com/{TenantId}/oauth2/token", values);
+                var response = client.UploadValues($"https://login.microsoftonline.com/{Settings.TenantId}/oauth2/token", values);
 
                 responseToken = Encoding.Default.GetString(response);
             }
@@ -148,8 +139,7 @@ namespace EMC.SPaaS.AuthenticationProviders
         {
             public AzureToken(string content)
             {
-                //TODO:CONFIGURATION
-                Provider = "Azure";
+                Provider = AzureConstants.ProviderName;
 
                 Content = content;
 
@@ -168,5 +158,21 @@ namespace EMC.SPaaS.AuthenticationProviders
                 UserInfo = new AzureUserInfo(userInfo);
             }
         }
+    }
+
+    public class AzureOAuthSettings
+    {
+        public AzureOAuthSettings(string tenantId, string clientId, string clientSecret, string resource)
+        {
+            TenantId = tenantId;
+            ClientId = clientId;
+            ClientSecret = clientSecret;
+            Resource = resource;
+        }
+
+        public string TenantId { get; private set; }
+        public string ClientId { get; private set; }
+        internal string ClientSecret { get; set; }
+        public string Resource { get; private set; }
     }
 }
