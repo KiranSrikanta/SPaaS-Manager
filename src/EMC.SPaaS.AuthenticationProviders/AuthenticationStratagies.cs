@@ -15,7 +15,7 @@ namespace EMC.SPaaS.AuthenticationProviders
         {
             AuthenticationProviders = new List<IAuthenticationProvider>();
 
-            AuthenticationProviders.Add(new AzureAdOAuthProvider(Settings.Azure.TenantId, Settings.Azure.ClientId, Settings.Azure.ClientSecret, Settings.Azure.Resource));
+            AuthenticationProviders.Add(new AzureAdOAuthProvider(Settings.Azure));
         }
 
         public IAuthenticationProvider GetAuthenticationStratagyForProvider(string Provider)

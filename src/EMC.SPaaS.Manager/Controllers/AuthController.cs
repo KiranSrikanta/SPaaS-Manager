@@ -55,15 +55,22 @@ namespace EMC.SPaaS.Manager.Controllers
             var token = authProvider.GetToken(code, redirectUri);
 
             var userToSave = DbContext.Users.FirstOrDefault(u => u.UserId == token.UserInfo.Email);
+            bool newUser = false;
             if (userToSave == null)
-                userToSave = new UserEntity();
+            {
+                userToSave = new UserEntity(); newUser = true;
+            }
 
             userToSave.UserId = token.UserInfo.Email;
             userToSave.UserName = token.UserInfo.Name;
             userToSave.AccessToken = token.RawContent;
             userToSave.AuthenticationProvider = token.Provider;
 
-            DbContext.Add(userToSave);
+            if (newUser)
+                DbContext.Add(userToSave);
+            else
+                DbContext.Update(userToSave);
+
             DbContext.SaveChanges();
 
             var authData = new Dictionary<string, object>()

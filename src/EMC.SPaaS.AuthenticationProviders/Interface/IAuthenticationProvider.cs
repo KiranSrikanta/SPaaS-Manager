@@ -16,22 +16,21 @@ namespace EMC.SPaaS.AuthenticationProviders
 
         Token GetToken(string authCode, string redirectUrl);
 
-        IDictionary<string, string> ParseTokenContent(string token);
+        string GetApiAccessToken(string token);
 
         string RefreshToken(string refreshCode);
     }
 
     public class OAuthUserInfo
     {
-        public string Name { get; protected set; }
-        public string Email { get; protected set; }
-        public IDictionary<string, string> OtherProperties { get; protected set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
     }
 
     public class Token
     {
-        public string Provider { get; protected set; }
-        public string RawContent { get; protected set; }
-        public OAuthUserInfo UserInfo { get; protected set; }
+        public string Provider { get; set; }
+        public string RawContent { get; set; }
+        public OAuthUserInfo UserInfo { get; set; }
     }
 }
