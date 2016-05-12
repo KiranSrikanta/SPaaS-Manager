@@ -6,6 +6,7 @@
 
   "dependencies": {
     "EMC.SPaaS.AuthenticationProviders": "1.0.0-*",
+    "EMC.SPaaS.Entities": "1.0.0-*",
     "EMC.SPaaS.ProvisioningEngine": "1.0.0-*",
     "Microsoft.ApplicationInsights.AspNet": "1.0.0-rc1",
     "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
@@ -21,6 +22,7 @@
 
   "commands": {
     "web": "Microsoft.AspNet.Server.Kestrel",
+    "ef": "EntityFramework.Commands"
   },
 
   "frameworks": {

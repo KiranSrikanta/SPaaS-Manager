@@ -8,8 +8,13 @@
 
   "frameworks": {
     "net451": {
+      "dependencies": {
+        "EntityFramework7.Npgsql": "3.1.0-rc1-3"
+      },
       "frameworkAssemblies": {
-        "System.XML": "4.0.0.0"
+        "System.Data.Linq": "4.0.0.0",
+        "System.XML": "4.0.0.0",
+        "System.Runtime": "4.0.10.0"
       }
     },
     "dotnet5.4": {

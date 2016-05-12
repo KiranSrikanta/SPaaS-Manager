@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using EMC.SPaaS.AuthenticationProviders;
 using Microsoft.Extensions.OptionsModel;
+using EMC.SPaaS.Entities;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,16 +15,20 @@ namespace EMC.SPaaS.Manager.Controllers
     {
         internal AuthenticationProviderFactory ProviderFactory { get; set; }
 
+        SPaaSDbContext DbContext { get; set; }
+
         string redirectUri = "http://localhost:27934/api/auth/azure/callback";
 
         readonly string serverSecret;
 
-        public AuthController(IOptions<AuthenticationConfigurations> authSettings)
+        public AuthController(IOptions<AuthenticationConfigurations> authSettings, SPaaSDbContext dbContext)
         {
             OAuthSettingsProvider settingsProvider = new OAuthSettingsProvider(authSettings.Value);
             ProviderFactory = new AuthenticationProviderFactory(settingsProvider.Settings);
 
             serverSecret = authSettings.Value.ServerSecret;
+
+            DbContext = dbContext;
         }
 
         #region Routes
@@ -49,6 +54,12 @@ namespace EMC.SPaaS.Manager.Controllers
             var token = authProvider.GetToken(code, redirectUri);
 
             //TODO:SAVE TO DB
+            //var user = new UserEntity();
+            //user.Id = 1;
+            //user.UserId = "AAAAAAaa";
+            //user.UserName = "BBB";
+            //DbContext.Add(user);
+            //DbContext.SaveChanges();
 
             var authData = new Dictionary<string, object>()
             {

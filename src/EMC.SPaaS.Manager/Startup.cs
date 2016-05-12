@@ -7,7 +7,8 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-
+using Microsoft.Data.Entity;
+using EMC.SPaaS.Entities;
 
 namespace EMC.SPaaS.Manager
 {
@@ -40,6 +41,13 @@ namespace EMC.SPaaS.Manager
             services.AddOptions();
 
             services.Configure<AuthenticationConfigurations>(Configuration.GetSection("Authentication"));
+
+            var dataConfigSection = Configuration.GetSection("Data");
+            var defaultConnection = dataConfigSection.GetSection("DefaultConnection");
+            var connectionString = defaultConnection["ConnectionString"];
+            services.AddEntityFramework().AddNpgsql().AddDbContext<SPaaSDbContext>(options => {
+                options.UseNpgsql(connectionString);
+            });
 
             services.AddMvc();
         }

@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0-*",
+  "description": "EMC.SPaaS.Entities Class Library",
+  "authors": [ "srikak" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "net451": { }
+  },
+  "dependencies": {
+    "EntityFramework.Commands": "7.0.0-rc1-final",
+    "EntityFramework7.Npgsql": "3.1.0-rc1-3"
+  },
+
+  "commands": {
+    "ef": "EntityFramework.Commands"
+  },
+  "userSecretsId": "aspnet5-EMC.SPaaS.Entities-20160512015445"
+}
