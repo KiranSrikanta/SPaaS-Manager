@@ -11,6 +11,8 @@ namespace EMC.SPaaS.Entities
         public SPaaSDbContext() : base()
         {
             Database.EnsureCreated();
+
+            Database.Migrate();
         }
 
 
