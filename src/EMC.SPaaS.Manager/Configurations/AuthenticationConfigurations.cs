@@ -15,15 +15,19 @@ namespace EMC.SPaaS.Manager
         public string ServerSecret { get; set; }
     }
 
-    public class OAuthSettingsProvider
+    public class OAuthProviderSettings
     {
-        public OAuthSettings Settings { get; private set; }
+        public dynamic Azure { get; set; }
 
-        public OAuthSettingsProvider(AuthenticationConfigurations config)
+        public OAuthProviderSettings(AuthenticationConfigurations config)
         {
-            var azureSettings = new AzureOAuthSettings(config.AzureClientTenantId, config.AzureClientID, config.AzureClientSecret, config.AzureClientResource);
-            Settings = new OAuthSettings();
-            Settings.Azure = azureSettings;
+            Azure = new
+            {
+                TenantId = config.AzureClientTenantId,
+                ClientId = config.AzureClientID,
+                ClientSecret = config.AzureClientSecret,
+                Resource = config.AzureClientResource
+            };
         }
     }
 }

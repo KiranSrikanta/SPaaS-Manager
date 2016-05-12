@@ -11,13 +11,24 @@ namespace EMC.SPaaS.AuthenticationProviders
 {
     public class AzureAdOAuthProvider : IAuthenticationProvider
     {
-        public AzureOAuthSettings Settings { get; private set; }
+        #region properties
+        public string TenantId { get; private set; }
+        public string ClientId { get; private set; }
+        internal string ClientSecret { get; set; }
+        public string Resource { get; private set; }
+        #endregion
 
-        public AzureAdOAuthProvider(AzureOAuthSettings settings)
+        #region ctor
+        public AzureAdOAuthProvider(string TenantId, string ClientId, string ClientSecret, string Resource)
         {
-            Settings = settings;
+            this.TenantId = TenantId;
+            this.ClientId = ClientId;
+            this.ClientSecret = ClientSecret;
+            this.Resource = Resource;
         }
+        #endregion
 
+        #region IAuthenticationProvider implementation
         public string Name
         {
             get
@@ -36,7 +47,7 @@ namespace EMC.SPaaS.AuthenticationProviders
 
         public string GetOAuthUrl(string redirectUrl)
         {
-            return $"https://login.microsoftonline.com/{Settings.TenantId}/oauth2/authorize?client_id={Settings.ClientId}&response_type=code&redirect_uri={redirectUrl}";
+            return $"https://login.microsoftonline.com/{TenantId}/oauth2/authorize?client_id={ClientId}&response_type=code&redirect_uri={redirectUrl}";
         }
 
         public Token GetToken(string authCode, string redirectUrl)
@@ -46,13 +57,13 @@ namespace EMC.SPaaS.AuthenticationProviders
             {
                 var values = new NameValueCollection();
                 values["grant_type"] = "authorization_code";
-                values["client_id"] = Settings.ClientId;
-                values["client_secret"] = Settings.ClientSecret;
+                values["client_id"] = ClientId;
+                values["client_secret"] = ClientSecret;
                 values["code"] = authCode;
                 values["redirect_uri"] = redirectUrl;
-                values["resource"] = Settings.Resource;
+                values["resource"] = Resource;
 
-                var response = client.UploadValues($"https://login.microsoftonline.com/{Settings.TenantId}/oauth2/token", values);
+                var response = client.UploadValues($"https://login.microsoftonline.com/{TenantId}/oauth2/token", values);
 
                 responseToken = Encoding.Default.GetString(response);
             }
@@ -83,12 +94,96 @@ namespace EMC.SPaaS.AuthenticationProviders
             //return responseString;
         }
 
+        public IDictionary<string, string> ParseTokenContent(string token)
+        {
+            var azureToken = Newtonsoft.Json.JsonConvert.DeserializeObject<AzureAccessToken>(token, new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            });
+
+            Dictionary<string, string> tokenContent = new Dictionary<string, string>();
+            tokenContent.Add(nameof(azureToken.access_token), azureToken.access_token);
+            tokenContent.Add(nameof(azureToken.expires_in), azureToken.expires_in);
+            tokenContent.Add(nameof(azureToken.expires_on), azureToken.expires_on);
+            tokenContent.Add(nameof(azureToken.id_token), azureToken.id_token);
+            tokenContent.Add(nameof(azureToken.not_before), azureToken.not_before);
+            tokenContent.Add(nameof(azureToken.refresh_token), azureToken.refresh_token);
+            tokenContent.Add(nameof(azureToken.resource), azureToken.resource);
+            tokenContent.Add(nameof(azureToken.scope), azureToken.scope);
+            tokenContent.Add(nameof(azureToken.token_type), azureToken.token_type);
+
+            return tokenContent;
+        }
+
+        #region GetToken method return classes
+        class AzureUserInfo : OAuthUserInfo
+        {
+            public AzureUserInfo(UserInfoToken id_token) : base()
+            {
+                OtherProperties = new Dictionary<string, string>();
+                OtherProperties.Add(nameof(id_token.aud), id_token.aud);
+                OtherProperties.Add(nameof(id_token.email), id_token.email);
+                OtherProperties.Add(nameof(id_token.exp), id_token.exp.ToString());
+                OtherProperties.Add(nameof(id_token.family_name), id_token.family_name);
+                OtherProperties.Add(nameof(id_token.given_name), id_token.given_name);
+                OtherProperties.Add(nameof(id_token.iat), id_token.iat.ToString());
+                OtherProperties.Add(nameof(id_token.idp), id_token.idp);
+                OtherProperties.Add(nameof(id_token.ipaddr), id_token.ipaddr);
+                OtherProperties.Add(nameof(id_token.iss), id_token.iss);
+                OtherProperties.Add(nameof(id_token.name), id_token.name);
+                OtherProperties.Add(nameof(id_token.nbf), id_token.nbf.ToString());
+                OtherProperties.Add(nameof(id_token.oid), id_token.oid);
+                OtherProperties.Add(nameof(id_token.sub), id_token.sub);
+                OtherProperties.Add(nameof(id_token.tid), id_token.tid);
+                OtherProperties.Add(nameof(id_token.unique_name), id_token.unique_name);
+                OtherProperties.Add(nameof(id_token.ver), id_token.ver);
+
+                base.Email = id_token.email;
+                base.Name = id_token.name;
+            }
+        }
+
+        class AzureToken : Token
+        {
+            public AzureToken(string content)
+            {
+                Provider = AzureConstants.ProviderName;
+
+                RawContent = content;
+
+                var token = Newtonsoft.Json.JsonConvert.DeserializeObject<AzureAccessToken>(RawContent, new JsonSerializerSettings
+                {
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                });
+
+                var userInfoString = JWT.JsonWebToken.Decode(token.id_token, string.Empty, false);
+
+                var userInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<UserInfoToken>(userInfoString, new JsonSerializerSettings
+                {
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                });
+
+                UserInfo = new AzureUserInfo(userInfo);
+            }
+        } 
+        #endregion
+        #endregion
+
+        #region response token classes
         class AzureAccessToken
         {
+            public string token_type { get; set; }
+            public string scope { get; set; }
+            public string expires_in { get; set; }
+            public string expires_on { get; set; }
+            public string not_before { get; set; }
+            public string resource { get; set; }
+            public string access_token { get; set; }
+            public string refresh_token { get; set; }
             public string id_token { get; set; }
         }
 
-        class IdToken
+        class UserInfoToken
         {
             public string aud { get; set; }
             public string iss { get; set; }
@@ -107,72 +202,6 @@ namespace EMC.SPaaS.AuthenticationProviders
             public string unique_name { get; set; }
             public string ver { get; set; }
         }
-
-        class AzureUserInfo : OAuthUserInfo
-        {
-            public AzureUserInfo(IdToken id_token) : base()
-            {
-                Claims = new Dictionary<string, string>();
-                Claims.Add(nameof(id_token.aud), id_token.aud);
-                Claims.Add(nameof(id_token.email), id_token.email);
-                Claims.Add(nameof(id_token.exp), id_token.exp.ToString());
-                Claims.Add(nameof(id_token.family_name), id_token.family_name);
-                Claims.Add(nameof(id_token.given_name), id_token.given_name);
-                Claims.Add(nameof(id_token.iat), id_token.iat.ToString());
-                Claims.Add(nameof(id_token.idp), id_token.idp);
-                Claims.Add(nameof(id_token.ipaddr), id_token.ipaddr);
-                Claims.Add(nameof(id_token.iss), id_token.iss);
-                Claims.Add(nameof(id_token.name), id_token.name);
-                Claims.Add(nameof(id_token.nbf), id_token.nbf.ToString());
-                Claims.Add(nameof(id_token.oid), id_token.oid);
-                Claims.Add(nameof(id_token.sub), id_token.sub);
-                Claims.Add(nameof(id_token.tid), id_token.tid);
-                Claims.Add(nameof(id_token.unique_name), id_token.unique_name);
-                Claims.Add(nameof(id_token.ver), id_token.ver);
-
-                base.Id = id_token.email;
-                base.Name = id_token.name;
-            }
-        }
-
-        class AzureToken : Token
-        {
-            public AzureToken(string content)
-            {
-                Provider = AzureConstants.ProviderName;
-
-                Content = content;
-
-                var token = Newtonsoft.Json.JsonConvert.DeserializeObject<AzureAccessToken>(Content, new JsonSerializerSettings
-                {
-                    MissingMemberHandling = MissingMemberHandling.Ignore
-                });
-
-                var userInfoString = JWT.JsonWebToken.Decode(token.id_token, string.Empty, false);
-
-                var userInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<IdToken>(userInfoString, new JsonSerializerSettings
-                {
-                    MissingMemberHandling = MissingMemberHandling.Ignore
-                });
-
-                UserInfo = new AzureUserInfo(userInfo);
-            }
-        }
-    }
-
-    public class AzureOAuthSettings
-    {
-        public AzureOAuthSettings(string tenantId, string clientId, string clientSecret, string resource)
-        {
-            TenantId = tenantId;
-            ClientId = clientId;
-            ClientSecret = clientSecret;
-            Resource = resource;
-        }
-
-        public string TenantId { get; private set; }
-        public string ClientId { get; private set; }
-        internal string ClientSecret { get; set; }
-        public string Resource { get; private set; }
+        #endregion
     }
 }

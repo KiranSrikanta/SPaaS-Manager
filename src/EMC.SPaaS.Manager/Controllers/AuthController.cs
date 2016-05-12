@@ -13,18 +13,19 @@ namespace EMC.SPaaS.Manager.Controllers
 {
     public class AuthController : Controller
     {
-        internal AuthenticationProviderFactory ProviderFactory { get; set; }
+        internal AuthenticationStratagies AllAuthenticationStratagies { get; set; }
 
         SPaaSDbContext DbContext { get; set; }
 
-        string redirectUri = "http://localhost:27934/api/auth/azure/callback";
+        //TODO:Make hostname dynamic
+        const string redirectUri = "http://localhost:27934/api/auth/azure/callback";
 
         readonly string serverSecret;
 
         public AuthController(IOptions<AuthenticationConfigurations> authSettings, SPaaSDbContext dbContext)
         {
-            OAuthSettingsProvider settingsProvider = new OAuthSettingsProvider(authSettings.Value);
-            ProviderFactory = new AuthenticationProviderFactory(settingsProvider.Settings);
+            OAuthProviderSettings settings = new OAuthProviderSettings(authSettings.Value);
+            AllAuthenticationStratagies = new AuthenticationStratagies(settings);
 
             serverSecret = authSettings.Value.ServerSecret;
 
@@ -37,7 +38,7 @@ namespace EMC.SPaaS.Manager.Controllers
         [HttpGet("{provider}")]
         public void Login(string provider)
         {
-            var authProvider = ProviderFactory.GetAuthenticationStratagy(provider);
+            var authProvider = AllAuthenticationStratagies.GetAuthenticationStratagyForProvider(provider);
 
             Response.Redirect(authProvider.GetOAuthUrl(redirectUri));
         }
@@ -47,25 +48,30 @@ namespace EMC.SPaaS.Manager.Controllers
         [Route("api/[controller]/{provider}/callback")]
         public void Callback(string provider)
         {
-            var authProvider = ProviderFactory.GetAuthenticationStratagy(provider);
+            var authProvider = AllAuthenticationStratagies.GetAuthenticationStratagyForProvider(provider);
 
             var code = Request.Query[authProvider.QueryStringKeyForCode][0];
 
             var token = authProvider.GetToken(code, redirectUri);
 
-            //TODO:SAVE TO DB
-            //var user = new UserEntity();
-            //user.Id = 1;
-            //user.UserId = "AAAAAAaa";
-            //user.UserName = "BBB";
-            //DbContext.Add(user);
-            //DbContext.SaveChanges();
+            var userToSave = DbContext.Users.FirstOrDefault(u => u.UserId == token.UserInfo.Email);
+            if (userToSave == null)
+                userToSave = new UserEntity();
+
+            userToSave.UserId = token.UserInfo.Email;
+            userToSave.UserName = token.UserInfo.Name;
+            userToSave.AccessToken = token.RawContent;
+            userToSave.AuthenticationProvider = token.Provider;
+
+            DbContext.Add(userToSave);
+            DbContext.SaveChanges();
 
             var authData = new Dictionary<string, object>()
             {
                 { Constants.AuthenticationSession.Properties.Provider, token.Provider },
                 { Constants.AuthenticationSession.Properties.UserName, token.UserInfo.Name },
-                { Constants.AuthenticationSession.Properties.UserId, token.UserInfo.Id }
+                { Constants.AuthenticationSession.Properties.Email, token.UserInfo.Email },
+                { Constants.AuthenticationSession.Properties.UserId, userToSave.Id }
             };
 
             string sToken = JWT.JsonWebToken.Encode(authData, serverSecret, JWT.JwtHashAlgorithm.HS256);

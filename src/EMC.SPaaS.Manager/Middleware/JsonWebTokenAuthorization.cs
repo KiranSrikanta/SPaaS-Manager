@@ -45,6 +45,7 @@ namespace EMC.SPaaS.Manager
 
                         List<System.Security.Claims.Claim> claims = new List<System.Security.Claims.Claim>();
                         claims.Add(new System.Security.Claims.Claim(Constants.AuthenticationSession.Properties.UserId, payload[Constants.AuthenticationSession.Properties.UserId].ToString()));
+                        claims.Add(new System.Security.Claims.Claim(Constants.AuthenticationSession.Properties.Email, payload[Constants.AuthenticationSession.Properties.Email].ToString()));
                         claims.Add(new System.Security.Claims.Claim(Constants.AuthenticationSession.Properties.UserName, payload[Constants.AuthenticationSession.Properties.UserName].ToString()));
                         context.User.AddIdentity(new System.Security.Claims.ClaimsIdentity(claims, payload[Constants.AuthenticationSession.Properties.Provider].ToString()));
                     }

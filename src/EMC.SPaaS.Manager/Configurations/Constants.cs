@@ -19,6 +19,7 @@ namespace EMC.SPaaS.Manager
             public static class Properties
             {
                 public const string UserName = "UserName";
+                public const string Email = "Email";
                 public const string UserId = "UserId";
                 public const string Provider = "Provider";
             }
