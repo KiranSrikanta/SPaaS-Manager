@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Data.Entity;
 using EMC.SPaaS.Entities;
+using EMC.SPaaS.AuthenticationProviders;
 
 namespace EMC.SPaaS.Manager
 {
@@ -40,7 +41,15 @@ namespace EMC.SPaaS.Manager
 
             services.AddOptions();
 
-            services.Configure<AuthenticationConfigurations>(Configuration.GetSection("Authentication"));
+            services.Configure<WebAppConfigurations>(Configuration.GetSection("WebApp"));
+
+            services.AddScoped<ProvisioningEngine.ProvisionerFactory>((IServiceProvider s) => {
+                return new ProvisioningEngine.ProvisionerFactory(Configuration.GetSection("Authentication"));
+            });
+
+            services.AddScoped<AuthenticationStratagies>((IServiceProvider s) => {
+                return new AuthenticationStratagies(Configuration.GetSection("Authentication"));
+            });
 
             var dataConfigSection = Configuration.GetSection("Data");
             var defaultConnection = dataConfigSection.GetSection("DefaultConnection");
@@ -48,7 +57,7 @@ namespace EMC.SPaaS.Manager
             services.AddEntityFramework().AddNpgsql().AddDbContext<SPaaSDbContext>(options => {
                 options.UseNpgsql(connectionString);
             });
-
+            
             services.AddMvc();
         }
 

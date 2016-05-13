@@ -14,7 +14,7 @@ namespace EMC.SPaaS.Manager
 
         private readonly string serverSecret;
 
-        public JsonWebTokenAuthorization(RequestDelegate next, IOptions<AuthenticationConfigurations> authSettings)
+        public JsonWebTokenAuthorization(RequestDelegate next, IOptions<WebAppConfigurations> authSettings)
         {
             _next = next;
             serverSecret = authSettings.Value.ServerSecret;

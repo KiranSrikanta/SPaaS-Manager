@@ -7,11 +7,11 @@ using EMC.SPaaS.DesignManager;
 
 namespace EMC.SPaaS.ProvisioningEngine
 {
-    public class Provisioner<T> : IProvisioner where T : ISubscription
+    public class Provisioner : IProvisioner
     {
-        ICloudProvider<T> _cloudProvider;
+        ICloudProvider _cloudProvider;
 
-        public Provisioner(ICloudProvider<T> CloudProvider)
+        public Provisioner(ICloudProvider CloudProvider)
         {
             _cloudProvider = CloudProvider;
         }

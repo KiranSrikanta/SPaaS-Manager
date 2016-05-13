@@ -4,29 +4,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EMC.SPaaS.DesignManager;
+using Microsoft.WindowsAzure.Management.Compute;
+using Microsoft.WindowsAzure;
+using EMC.SPaaS.AuthenticationProviders;
+using Microsoft.Extensions.Configuration;
+using EMC.SPaaS.Utility;
 
 namespace EMC.SPaaS.CloudProvider
 {
-    public class Azure : ICloudProvider<AzureSubscription>
+    public class Azure : ICloudProvider
     {
-        public Azure(AzureSubscription Subscription)
-        {
-            _subscription = Subscription;
-        }
+        SubscriptionCloudCredentials Credentials { get; set; }
 
-        private AzureSubscription _subscription;
+        IAuthenticationProvider OAuthProvider { get; set; }
 
-        public AzureSubscription Subscription
+        public Azure(IConfigurationSection configuration, string token)
         {
-            get
-            {
-                return _subscription;
-            }
+            OAuthProvider = new AzureAdOAuthProvider(configuration);
+
+            Credentials = new TokenCloudCredentials(
+                configuration[GlobalConstants.CloudProviders.Azure.ConfigurationKeys.SubscriptionId],
+                OAuthProvider.GetApiAccessToken(token)
+            );
         }
 
         public string CreateVM(string Name)
         {
-            throw new NotImplementedException();
+            ComputeManagementClient client = new ComputeManagementClient(Credentials);
+
+            var result = client.VirtualMachines.BeginCreating("aaa", "bbb", new Microsoft.WindowsAzure.Management.Compute.Models.VirtualMachineCreateParameters
+            {
+                RoleName = "ccc"
+            });
+
+            return result.RequestId;
         }
 
         public bool DeleteVM(string id)

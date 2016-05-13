@@ -6,6 +6,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
+using EMC.SPaaS.Utility;
 
 namespace EMC.SPaaS.AuthenticationProviders
 {
@@ -19,12 +21,12 @@ namespace EMC.SPaaS.AuthenticationProviders
         #endregion
 
         #region ctor
-        public AzureAdOAuthProvider(dynamic settings)
+        public AzureAdOAuthProvider(IConfigurationSection settings)
         {
-            this.TenantId = settings.GetType().GetProperty("TenantId").GetValue(settings, null);
-            this.ClientId = settings.GetType().GetProperty("ClientId").GetValue(settings, null);
-            this.ClientSecret = settings.GetType().GetProperty("ClientSecret").GetValue(settings, null);
-            this.Resource = settings.GetType().GetProperty("Resource").GetValue(settings, null);
+            this.TenantId = settings[GlobalConstants.CloudProviders.Azure.ConfigurationKeys.TenantId];
+            this.ClientId = settings[GlobalConstants.CloudProviders.Azure.ConfigurationKeys.ClientId];
+            this.ClientSecret = settings[GlobalConstants.CloudProviders.Azure.ConfigurationKeys.ClientSecret];
+            this.Resource = settings[GlobalConstants.CloudProviders.Azure.ConfigurationKeys.Resource];
         }
         #endregion
 
@@ -33,7 +35,7 @@ namespace EMC.SPaaS.AuthenticationProviders
         {
             get
             {
-                return AzureConstants.ProviderName;
+                return GlobalConstants.CloudProviders.Azure.Name;
             }
         }
 

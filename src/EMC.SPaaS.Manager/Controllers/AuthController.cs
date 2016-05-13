@@ -22,12 +22,11 @@ namespace EMC.SPaaS.Manager.Controllers
 
         readonly string serverSecret;
 
-        public AuthController(IOptions<AuthenticationConfigurations> authSettings, SPaaSDbContext dbContext)
+        public AuthController(AuthenticationStratagies authStratagies, SPaaSDbContext dbContext, IOptions<WebAppConfigurations> appConfigs)
         {
-            OAuthProviderSettings settings = new OAuthProviderSettings(authSettings.Value);
-            AllAuthenticationStratagies = new AuthenticationStratagies(settings);
+            AllAuthenticationStratagies = authStratagies;
 
-            serverSecret = authSettings.Value.ServerSecret;
+            serverSecret = appConfigs.Value.ServerSecret;
 
             DbContext = dbContext;
         }

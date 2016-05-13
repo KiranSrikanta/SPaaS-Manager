@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using EMC.SPaaS.Utility;
 
 namespace EMC.SPaaS.AuthenticationProviders
 {
@@ -11,11 +13,11 @@ namespace EMC.SPaaS.AuthenticationProviders
     {
         List<IAuthenticationProvider> AuthenticationProviders { get; set; }
 
-        public AuthenticationStratagies(dynamic Settings)
+        public AuthenticationStratagies(IConfigurationSection Settings)
         {
             AuthenticationProviders = new List<IAuthenticationProvider>();
 
-            AuthenticationProviders.Add(new AzureAdOAuthProvider(Settings.Azure));
+            AuthenticationProviders.Add(new AzureAdOAuthProvider(Settings.GetSection(GlobalConstants.CloudProviders.Azure.Name)));
         }
 
         public IAuthenticationProvider GetAuthenticationStratagyForProvider(string Provider)

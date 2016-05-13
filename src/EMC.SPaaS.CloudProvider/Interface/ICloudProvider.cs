@@ -6,10 +6,8 @@ using EMC.SPaaS.DesignManager;
 
 namespace EMC.SPaaS.CloudProvider
 {
-    public interface ICloudProvider<T> where T : ISubscription
+    public interface ICloudProvider
     {
-        T Subscription { get; }
-
         string CreateVM(string Name);
 
         bool DeleteVM(string id);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using EMC.SPaaS.Utility;
 
 namespace EMC.SPaaS.AuthenticationProviders
 {
@@ -24,7 +25,7 @@ namespace EMC.SPaaS.AuthenticationProviders
 
             return new Token
             {
-                Provider = AzureConstants.ProviderName,
+                Provider = GlobalConstants.CloudProviders.Azure.Name,
                 RawContent = accessToken,
                 UserInfo = new OAuthUserInfo
                 {
@@ -43,6 +44,7 @@ namespace EMC.SPaaS.AuthenticationProviders
 
             return token.access_token;
         }
+
         #region response token classes
         class AzureAccessToken
         {

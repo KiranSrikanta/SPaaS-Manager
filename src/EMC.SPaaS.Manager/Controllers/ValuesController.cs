@@ -11,12 +11,22 @@ namespace EMC.SPaaS.Manager.Controllers
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
+        private ProvisionerFactory ProvisioningFactory
+        {
+            get; set;
+        }
+
+        public ValuesController(ProvisionerFactory provisioningFactory)
+        {
+            this.ProvisioningFactory = provisioningFactory;
+        }
         // GET: api/values
         [HttpGet]
         public IEnumerable<string> Get()
         {
+            
             //TODO: PASS IN LOGGED IN USER'S SUBSCRIPTION!
-            var Provisioner = new ProvisionerFactory().CreateProvisioner("Azure");
+            var Provisioner = ProvisioningFactory.CreateProvisioner(User);
             
             return new string[] { "value1", "value2" };
         }
