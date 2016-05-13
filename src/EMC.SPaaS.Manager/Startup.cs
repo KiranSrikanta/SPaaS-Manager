@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Data.Entity;
 using EMC.SPaaS.Entities;
 using EMC.SPaaS.AuthenticationProviders;
+using EMC.SPaaS.RepositoryManager;
 
 namespace EMC.SPaaS.Manager
 {
@@ -54,10 +55,14 @@ namespace EMC.SPaaS.Manager
             var dataConfigSection = Configuration.GetSection("Data");
             var defaultConnection = dataConfigSection.GetSection("DefaultConnection");
             var connectionString = defaultConnection["ConnectionString"];
-            services.AddEntityFramework().AddNpgsql().AddDbContext<SPaaSDbContext>(options => {
+            //services.AddEntityFramework().AddNpgsql().AddDbContext<SPaaSDbContext>(options => {
+            //    options.UseNpgsql(connectionString);
+            //});
+            services.AddEntityFramework().AddNpgsql().AddDbContext<RepositoryContext>(options =>
+            {
                 options.UseNpgsql(connectionString);
             });
-            
+            services.AddScoped<IRepository<DesignItem, string>, DesignRepository>();
             services.AddMvc();
         }
 
