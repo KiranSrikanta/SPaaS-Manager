@@ -1,14 +1,14 @@
-﻿{
+{
   "version": "1.0.0-*",
   "description": "EMC.SPaaS.RepositoryManager Class Library",
   "authors": [ "kuzhij1" ],
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
-
   "frameworks": {
     "net451": {
       "dependencies": {
+        "System.Runtime": "1.0.0-*"
       }
     },
     "net452": {
@@ -26,4 +26,6 @@
   "commands": {
     "ef": "EntityFramework.Commands"
   }
+
+
 }

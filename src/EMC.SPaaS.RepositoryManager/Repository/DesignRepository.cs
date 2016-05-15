@@ -25,8 +25,8 @@ namespace EMC.SPaaS.RepositoryManager
         {
             DesignItem fItem;
             IEnumerable<DesignItem> _designItems = _context.DesignItems.ToList();
-            fItem = null;
-           // fItem = _designItems.SingleOrDefault(s => s.DesignID == designID);
+            //fItem = null;
+           fItem = _designItems.SingleOrDefault(s => s.DesignID == designID);
             return fItem;
         }
 
@@ -38,7 +38,8 @@ namespace EMC.SPaaS.RepositoryManager
 
         public void Remove(DesignItem designItem)
         {
-           // var obj = _context.DesignItems.Single(m => m.DesignID == designItem.DesignID);
+           var obj = _context.DesignItems.Single(m => m.DesignID == designItem.DesignID);
+            _context.DesignItems.Remove(obj);
 
         }
 
