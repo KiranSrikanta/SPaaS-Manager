@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,13 @@ namespace EMC.SPaaS.Entities
     public class SPaaSDbContext : DbContext
     {
         public SPaaSDbContext() : base()
+        {
+            Database.EnsureCreated();
+
+            Database.Migrate();
+        }
+
+        public SPaaSDbContext(DbContextOptions options) : base(options)
         {
             Database.EnsureCreated();
 
