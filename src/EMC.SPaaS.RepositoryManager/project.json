@@ -8,11 +8,11 @@
   "frameworks": {
     "net451": {
       "dependencies": {
-        "System.Runtime": "1.0.0-*"
-      }
-    },
-    "net452": {
-      "dependencies": {
+      },
+      "frameworkAssemblies": {
+        "System.Data.Linq": "4.0.0.0",
+        "System.XML": "4.0.0.0",
+        "System.Runtime": "4.0.10.0"
       }
     }
 
