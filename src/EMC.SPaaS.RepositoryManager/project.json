@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0-*",
+  "description": "EMC.SPaaS.RepositoryManager Class Library",
+  "authors": [ "kuzhij1" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "net451": {
+      "dependencies": {
+        "System.Runtime": "1.0.0-*"
+      }
+    },
+    "net452": {
+      "dependencies": {
+      }
+    }
+
+
+  },
+  "dependencies": {
+    "EntityFramework.Commands": "7.0.0-rc1-final",
+    "EntityFramework7.Npgsql": "3.1.0-rc1-3"
+  },
+
+  "commands": {
+    "ef": "EntityFramework.Commands"
+  }
+
+
+}

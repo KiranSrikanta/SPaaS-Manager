@@ -5,6 +5,7 @@
   },
 
   "dependencies": {
+    "EMC.SPaaS.RepositoryManager": "1.0.0-*",
     "EMC.SPaaS.AuthenticationProviders": "1.0.0-*",
     "EMC.SPaaS.Entities": "1.0.0-*",
     "EMC.SPaaS.ProvisioningEngine": "1.0.0-*",
