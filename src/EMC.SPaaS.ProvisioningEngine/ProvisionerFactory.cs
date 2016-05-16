@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EMC.SPaaS.CloudProvider;
 using Microsoft.Extensions.Configuration;
 using EMC.SPaaS.Utility;
+using EMC.SPaaS.Entities;
 
 namespace EMC.SPaaS.ProvisioningEngine
 {
@@ -15,13 +16,16 @@ namespace EMC.SPaaS.ProvisioningEngine
         {
             AuthenticationConfiguration = authConfiguration;
         }
-        public IProvisioner CreateProvisioner(System.Security.Claims.ClaimsPrincipal User)
+        public IProvisioner CreateProvisioner(UserEntity User)
         {
-            var uIde = User.Identities.FirstOrDefault(i => i.AuthenticationType == GlobalConstants.CloudProviders.Azure.Name);
             //TODO: IMPLEMENT STRATAGY PATTERN
-            if (User.Identity.AuthenticationType == GlobalConstants.CloudProviders.Azure.Name)
+            if (User.AuthenticationProvider == GlobalConstants.CloudProviders.Azure.Name)
             {
-                return new Provisioner(new Azure(AuthenticationConfiguration.GetSection(GlobalConstants.CloudProviders.Azure.Name), ""));
+                var azureCloudProvider = new Azure(AuthenticationConfiguration.GetSection(GlobalConstants.CloudProviders.Azure.Name), User.AccessToken);
+
+                azureCloudProvider.CreateVM("AAA");
+
+                return new Provisioner(azureCloudProvider);
             }
             else
                 return null;
