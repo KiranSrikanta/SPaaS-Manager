@@ -15,7 +15,7 @@ namespace EMC.SPaaS.Manager.Controllers
     {
         internal AuthenticationStratagies AllAuthenticationStratagies { get; set; }
 
-        SPaaSDbContext DbContext { get; set; }
+        Repository.RepositoryManager Repositories { get; set; }
 
         //TODO:Make hostname dynamic
         const string redirectUri = "http://localhost:27934/api/auth/azure/callback";
@@ -28,7 +28,7 @@ namespace EMC.SPaaS.Manager.Controllers
 
             serverSecret = appConfigs.Value.ServerSecret;
 
-            DbContext = dbContext;
+            Repositories = new Repository.RepositoryManager(dbContext);
         }
 
         #region Routes
@@ -53,31 +53,22 @@ namespace EMC.SPaaS.Manager.Controllers
 
             var token = authProvider.GetToken(code, redirectUri);
 
-            var userToSave = DbContext.Users.FirstOrDefault(u => u.UserId == token.UserInfo.Email);
-            bool newUser = false;
-            if (userToSave == null)
-            {
-                userToSave = new UserEntity(); newUser = true;
-            }
+            var user = new UserEntity();
+            user.UserId = token.UserInfo.Email;
+            user.UserName = token.UserInfo.Name;
+            user.AccessToken = token.RawContent;
+            user.AuthenticationProvider = token.Provider;
 
-            userToSave.UserId = token.UserInfo.Email;
-            userToSave.UserName = token.UserInfo.Name;
-            userToSave.AccessToken = token.RawContent;
-            userToSave.AuthenticationProvider = token.Provider;
+            Repositories.Users.AddOrUpdate(user);
 
-            if (newUser)
-                DbContext.Add(userToSave);
-            else
-                DbContext.Update(userToSave);
-
-            DbContext.SaveChanges();
+            Repositories.Save();
 
             var authData = new Dictionary<string, object>()
             {
                 { Constants.AuthenticationSession.Properties.Provider, token.Provider },
                 { Constants.AuthenticationSession.Properties.UserName, token.UserInfo.Name },
                 { Constants.AuthenticationSession.Properties.Email, token.UserInfo.Email },
-                { Constants.AuthenticationSession.Properties.UserId, userToSave.Id }
+                { Constants.AuthenticationSession.Properties.UserId, user.Id }
             };
 
             string sToken = JWT.JsonWebToken.Encode(authData, serverSecret, JWT.JwtHashAlgorithm.HS256);

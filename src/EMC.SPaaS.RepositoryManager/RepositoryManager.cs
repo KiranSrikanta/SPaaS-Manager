@@ -7,15 +7,29 @@ using EMC.SPaaS.Entities;
 
 namespace EMC.SPaaS.Repository
 {
-    public class RepositoryManager 
+    public class RepositoryManager
     {
         SPaaSDbContext Context { get; set; }
-             
+
         public RepositoryManager(SPaaSDbContext context)
         {
             Context = context;
         }
-        public IDesignRepository Designs { get; set; }
+        public IDesignRepository Designs
+        {
+            get
+            {
+                return new DesignRepository(Context);
+            }
+        }
+        public IUserRepository Users
+        {
+            get
+            {
+                return new UserRepository(Context);
+            }
+        }
+
 
         public void Save()
         {

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0-*",
-  "description": "EMC.SPaaS.RepositoryManager Class Library",
+  "description": "EMC.SPaaS.Repository Class Library",
   "authors": [ "kuzhij1" ],
   "tags": [ "" ],
   "projectUrl": "",
