@@ -19,6 +19,7 @@ namespace EMC.SPaaS.RepositoryManager
             nItem.DesignID = Guid.NewGuid().ToString();
             //Save to DB
             _context.DesignItems.Add(nItem);
+            _context.SaveChanges();
         }
 
         public DesignItem Find(string designID)
@@ -40,6 +41,7 @@ namespace EMC.SPaaS.RepositoryManager
         {
            var obj = _context.DesignItems.Single(m => m.DesignID == designItem.DesignID);
             _context.DesignItems.Remove(obj);
+            _context.SaveChanges();
 
         }
 
