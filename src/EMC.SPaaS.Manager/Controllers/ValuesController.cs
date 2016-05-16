@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using EMC.SPaaS.ProvisioningEngine;
 using Microsoft.AspNet.Authorization;
+using EMC.SPaaS.Entities;
 
 namespace EMC.SPaaS.Manager.Controllers
 {
@@ -16,18 +17,34 @@ namespace EMC.SPaaS.Manager.Controllers
             get; set;
         }
 
-        public ValuesController(ProvisionerFactory provisioningFactory)
+        private SPaaSDbContext DbContext { get; set; }
+
+        public ValuesController(ProvisionerFactory provisioningFactory, SPaaSDbContext dbContext)
         {
             this.ProvisioningFactory = provisioningFactory;
+            this.DbContext = dbContext;
         }
+
         // GET: api/values
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            
+
             //TODO: PASS IN LOGGED IN USER'S SUBSCRIPTION!
-            var Provisioner = ProvisioningFactory.CreateProvisioner(User);
-            
+
+            try
+            {
+                var sUserId = User.FindAll(Constants.AuthenticationSession.Properties.UserId).FirstOrDefault().Value;
+                int userId = int.Parse(sUserId);
+                var user = DbContext.Users.FirstOrDefault(u => u.Id == userId);
+                var Provisioner = ProvisioningFactory.CreateProvisioner(user);
+            }
+            catch (Exception)
+            {
+                
+            }
+            //var Provisioner = ProvisioningFactory.CreateProvisioner(User);
+
             return new string[] { "value1", "value2" };
         }
 

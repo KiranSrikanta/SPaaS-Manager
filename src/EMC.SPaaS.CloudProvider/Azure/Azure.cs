@@ -9,6 +9,10 @@ using Microsoft.WindowsAzure;
 using EMC.SPaaS.AuthenticationProviders;
 using Microsoft.Extensions.Configuration;
 using EMC.SPaaS.Utility;
+using Microsoft.WindowsAzure.Management.Compute.Models;
+using Microsoft.WindowsAzure.Management.Storage;
+using Microsoft.WindowsAzure.Management.Storage.Models;
+using Microsoft.WindowsAzure.Management.Models;
 
 namespace EMC.SPaaS.CloudProvider
 {
@@ -28,16 +32,136 @@ namespace EMC.SPaaS.CloudProvider
             );
         }
 
+
         public string CreateVM(string Name)
         {
-            ComputeManagementClient client = new ComputeManagementClient(Credentials);
+            string storageAccountName = "spaasstorage";
+            
 
-            var result = client.VirtualMachines.BeginCreating("aaa", "bbb", new Microsoft.WindowsAzure.Management.Compute.Models.VirtualMachineCreateParameters
+            string hostedService = "spaashost";
+            string hostedServiceLabel = "spaas";
+
+            string vmName = "vm1";
+            string vmUserName = "SPaaSAdmin";
+            string vmPassword = "Welcome@123";
+
+            string deploymentName = "testdeploy";
+
+
+            try
             {
-                RoleName = "ccc"
-            });
+                //DONE Works!
+                //storage account
+                //using (var storageClient = new StorageManagementClient(Credentials))
+                //{
+                //    storageClient.StorageAccounts.Create(new StorageAccountCreateParameters
+                //    {
+                //        Label = "SPaaS Storage Account",
+                //        Location = LocationNames.WestUS,
+                //        Name = storageAccountName,
+                //        AccountType = StorageAccountTypes.StandardLRS
+                //    });
+                //}
 
-            return result.RequestId;
+
+                //DONE Works!
+                //create cloud service
+                //using (var computeClient = new ComputeManagementClient(Credentials))
+                //{
+                //    computeClient.HostedServices.Create(new HostedServiceCreateParameters
+                //    {
+                //        Label = hostedServiceLabel,
+                //        Location = LocationNames.WestUS,
+                //        ServiceName = hostedService
+                //    });
+                //}
+
+
+                //create vm
+                using (var computeClient = new ComputeManagementClient(Credentials))
+                {
+                    var operatingSystemImageListResult = computeClient.VirtualMachineOSImages.List().Images;
+                    var imageName = operatingSystemImageListResult.FirstOrDefault().Name;
+
+                    //OS config
+                    var windowsConfigSet = new ConfigurationSet
+                    {
+                        ConfigurationSetType = ConfigurationSetTypes.WindowsProvisioningConfiguration,
+                        AdminPassword = vmPassword,
+                        AdminUserName = vmUserName,
+                        ComputerName = vmName,
+                        HostName = string.Format("{0}.cloudapp.net", hostedService)
+                    };
+
+                    //remote powershell and rdp
+                    var networkConfigSet = new ConfigurationSet
+                    {
+                        ConfigurationSetType = "NetworkConfiguration",
+                        InputEndpoints = new List<InputEndpoint>
+                          {
+                            new InputEndpoint
+                            {
+                              Name = "PowerShell",
+                              LocalPort = 5986,
+                              Protocol = "tcp",
+                              Port = 5986,
+                            },
+                            new InputEndpoint
+                            {
+                              Name = "Remote Desktop",
+                              LocalPort = 3389,
+                              Protocol = "tcp",
+                              Port = 3389,
+                            }
+                          }
+                    };
+
+                    //virtual harddisk
+                    var vhd = new OSVirtualHardDisk
+                    {
+                        SourceImageName = imageName,
+                        HostCaching = VirtualHardDiskHostCaching.ReadWrite,
+                        MediaLink = new Uri(string.Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd", storageAccountName, imageName))
+                    };
+
+                    //vm configuration
+                    var vmAttributes = new Role
+                    {
+                        RoleName = vmName,
+
+                        //Make configurable
+                        RoleSize = VirtualMachineRoleSize.Small,
+                        RoleType = VirtualMachineRoleType.PersistentVMRole.ToString(),
+                        OSVirtualHardDisk = vhd,
+                        ConfigurationSets = new List<ConfigurationSet> { windowsConfigSet, networkConfigSet },
+
+                        //Optional?
+                        ProvisionGuestAgent = true
+                    };
+
+                    //deployment config
+                    var deploymentParameters = new VirtualMachineCreateDeploymentParameters
+                    {
+                        Name = deploymentName,
+                        Label = deploymentName,
+                        DeploymentSlot = DeploymentSlot.Production,
+                        Roles = new List<Role> { vmAttributes }
+                    };
+
+                    //create the vm
+                    var deploymentResult = computeClient.VirtualMachines.CreateDeployment(hostedService, deploymentParameters);
+                    
+                    computeClient.VirtualMachines.Get("", "", "");
+                    computeClient.Deployments.GetByName("", "");
+
+                    return deploymentResult.RequestId;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
 
         public bool DeleteVM(string id)
