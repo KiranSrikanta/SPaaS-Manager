@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using EMC.SPaaS.RepositoryManager;
+using EMC.SPaaS.Entities;
+using EMC.SPaaS.Repository;
+
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace EMC.SPaaS.Manager.Controllers
@@ -11,25 +13,25 @@ namespace EMC.SPaaS.Manager.Controllers
     [Route("api/[controller]")]
     public class SharepointDesignController : Controller
     {
-        private IRepository<DesignItem, string> _repository;
+        private RepositoryManager Repositories { get; set; }
 
-        public SharepointDesignController(IRepository<DesignItem, string> repo)
+        public SharepointDesignController(SPaaSDbContext dbContext)
         {
-            _repository = repo;
+            Repositories = new RepositoryManager(dbContext);
         }
         // GET: api/values
         [HttpGet]
-        public IEnumerable<DesignItem> GetAll()
+        public IEnumerable<DesignEntity> GetAll()
         {
 
-            return _repository.GetAll();
+            return Repositories.Designs.GetAll(1);
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            return "value";
+            return Repositories.Designs.Find(id).DesignName;
         }
 
         // POST api/values

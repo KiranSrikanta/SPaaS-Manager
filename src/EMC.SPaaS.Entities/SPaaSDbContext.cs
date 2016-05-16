@@ -23,5 +23,7 @@ namespace EMC.SPaaS.Entities
         }
 
         public DbSet<UserEntity> Users { get; set; }
+
+        public DbSet<DesignEntity> Designs { get; set; }
     }
 }

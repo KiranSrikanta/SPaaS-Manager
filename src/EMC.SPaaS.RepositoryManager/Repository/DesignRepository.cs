@@ -2,54 +2,42 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EMC.SPaaS.Entities;
 
-namespace EMC.SPaaS.RepositoryManager
+namespace EMC.SPaaS.Repository
 {
-    public class DesignRepository : IRepository<DesignItem, string>
+    public class DesignRepository : IDesignRepository
     {
-        private readonly RepositoryContext _context;
-        public DesignRepository(RepositoryContext context)
+        private readonly SPaaSDbContext _context;
+        public DesignRepository(SPaaSDbContext context)
         {
             _context = context;
         }
 
         //static Dictionary<string, DesignItem> designItems = new Dictionary<string, DesignItem>();
-        public void Add(DesignItem nItem)
+        public void Add(DesignEntity nItem)
         {
-            nItem.DesignID = Guid.NewGuid().ToString();
+            
             //Save to DB
-            _context.DesignItems.Add(nItem);
+            _context.Designs.Add(nItem);
             _context.SaveChanges();
         }
 
-        public DesignItem Find(string designID)
+        public DesignEntity Find(int designID)
         {
-            DesignItem fItem;
-            IEnumerable<DesignItem> _designItems = _context.DesignItems.ToList();
-            //fItem = null;
-           fItem = _designItems.SingleOrDefault(s => s.DesignID == designID);
-            return fItem;
+            return _context.Designs.FirstOrDefault(s => s.DesignID == designID);
         }
 
-        public IEnumerable<DesignItem> GetAll()
+        public IEnumerable<DesignEntity> GetAll(int userID)
         {
             //return designItems.Values;
-            return _context.DesignItems.ToList();
+            throw new NotImplementedException();
         }
 
-        public void Remove(DesignItem designItem)
+        public void Remove(int designID)
         {
-           var obj = _context.DesignItems.Single(m => m.DesignID == designItem.DesignID);
-            _context.DesignItems.Remove(obj);
-            _context.SaveChanges();
-
-        }
-
-        public void Update(DesignItem oItem)
-        {
-            // _context.DesignItems.Update()
-            //designItems[oItem.DesignID] = oItem;
-            //ToDO
+           var design = _context.Designs.FirstOrDefault(s => s.DesignID == designID);
+            _context.Designs.Remove(design);
 
         }
     }

@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EMC.SPaaS.RepositoryManager
+namespace EMC.SPaaS.Entities
 {
-    public class DesignItem
+    public class DesignEntity
     {
         [Key]
-        public string DesignID { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int DesignID { get; set; }
         public string DesignXML { get; set; }
         public string DesignOwner { get; set; }
+        public string DesignName { get; set; }
     }
 }
