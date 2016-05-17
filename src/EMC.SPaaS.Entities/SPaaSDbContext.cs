@@ -12,7 +12,7 @@ namespace EMC.SPaaS.Entities
         public SPaaSDbContext() : base()
         {
             Database.EnsureCreated();
-
+            
             Database.Migrate();
         }
 
@@ -33,5 +33,15 @@ namespace EMC.SPaaS.Entities
         public DbSet<UserEntity> Users { get; set; }
 
         public DbSet<DesignEntity> Designs { get; set; }
+
+        public DbSet<InstanceEntity> Instances { get; set; }
+        public DbSet<InstanceStatus> InstanceStatuses { get; set; }
+
+        public DbSet<ProvisionedVmEntity> VMs { get; set; }
+        public DbSet<ProvisionedVmStatus> VMsStatuses { get; set; }
+
+        public DbSet<JobEntity> Jobs { get; set; }
+        public DbSet<JobType> JobTypes { get; set; }
+        public DbSet<JobStatus> JobStatuses { get; set; }
     }
 }

@@ -77,6 +77,8 @@ namespace EMC.SPaaS.Manager.Controllers
             {
                 Expires = DateTime.UtcNow.AddMinutes(5)
             });
+
+            Response.Redirect("http://localhost:27934/");
         }
         #endregion
     }
