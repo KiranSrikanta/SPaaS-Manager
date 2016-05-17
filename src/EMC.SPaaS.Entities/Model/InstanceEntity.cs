@@ -17,17 +17,30 @@ namespace EMC.SPaaS.Entities
 
         public string Name { get; set; }
 
+        public int UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public UserEntity User { get; set; }
+
         public int StatusId { get; set; }
 
         [ForeignKey("StatusId")]
-        public InstanceStatus Status { get; set; }
+        public InstanceStatusEntity Status { get; set; }
 
         public ICollection<ProvisionedVmEntity> VMs { get; set; }
 
         public ICollection<JobEntity> Jobs { get; set; }
     }
 
-    public class InstanceStatus
+    public enum InstanceStatus
+    {
+        NotProvisioned = 0,
+        TurnedOn,
+        TurnedOff,
+        Busy
+    }
+
+    public class InstanceStatusEntity
     {
         [Key]
         public int Id { get; set; }

@@ -27,10 +27,10 @@ namespace EMC.SPaaS.Entities
         public int StatusId { get; set; }
 
         [ForeignKey("StatusId")]
-        public ProvisionedVmStatus Status { get; set; }
+        public ProvisionedVmStatusEntity Status { get; set; }
     }
 
-    public class ProvisionedVmStatus
+    public class ProvisionedVmStatusEntity
     {
         [Key]
         public int Id { get; set; }
@@ -38,5 +38,13 @@ namespace EMC.SPaaS.Entities
         public string Status { get; set; }
 
         public ICollection<ProvisionedVmEntity> VMs { get; set; }
+    }
+
+    public enum ProvisionedVmStatus
+    {
+        NotProvisioned,
+        TurnedOn,
+        TurnedOff,
+        Busy
     }
 }

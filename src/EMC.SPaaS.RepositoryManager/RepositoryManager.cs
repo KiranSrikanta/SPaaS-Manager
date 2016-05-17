@@ -29,7 +29,13 @@ namespace EMC.SPaaS.Repository
                 return new UserRepository(Context);
             }
         }
-
+        public IInstanceRepository Instances
+        {
+            get
+            {
+                return new InstanceRepository(Context);
+            }
+        }
 
         public void Save()
         {

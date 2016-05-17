@@ -26,7 +26,7 @@ namespace EMC.SPaaS.Entities
         public int TypeId { get; set; }
 
         [ForeignKey("TypeId")]
-        public JobType Type { get; set; }
+        public JobTypeEntity Type { get; set; }
 
         [ForeignKey("InstanceId")]
         public InstanceEntity Instance { get; set; }
@@ -34,7 +34,15 @@ namespace EMC.SPaaS.Entities
         public int InstanceId { get; set; }
     }
 
-    public class JobStatus
+    public enum JobStatus
+    {
+        NotStarted = 0,
+        InProgress,
+        Successful,
+        Failed
+    }
+
+    public class JobStatusEntity
     {
         [Key]
         public int Id { get; set; }
@@ -44,7 +52,15 @@ namespace EMC.SPaaS.Entities
         public ICollection<JobEntity> Jobs { get; set; }
     }
 
-    public class JobType
+    public enum JobType
+    {
+        Provision = 0,
+        Release,
+        TurnOn,
+        TurnOff
+    }
+
+    public class JobTypeEntity
     {
         [Key]
         public int Id { get; set; }
