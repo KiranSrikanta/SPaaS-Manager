@@ -129,5 +129,21 @@ namespace EMC.SPaaS.Repository
                     throw new ArgumentOutOfRangeException(nameof(jobType));
             }
         }
+
+        public IEnumerable<ProvisionedVmEntity> GetVMs(InstanceEntity instance)
+        {
+            return instance.VMs;
+        }
+
+        public IEnumerable<ProvisionedVmEntity> GetVMs(int instanceId, int userId)
+        {
+            return GetInstance(instanceId, userId).VMs;
+        }
+
+        public void AddVM(InstanceEntity instance, ProvisionedVmEntity vm)
+        {
+            vm.InstanceId = instance.Id;
+            Context.VMs.Add(vm);
+        }
     }
 }

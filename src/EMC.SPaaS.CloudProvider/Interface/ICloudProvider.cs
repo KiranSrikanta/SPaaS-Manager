@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EMC.SPaaS.DesignManager;
+using EMC.SPaaS.Entities;
 
 namespace EMC.SPaaS.CloudProvider
 {
     public interface ICloudProvider
     {
-        string CreateVM(string Name);
+        void Initialize(InstanceEntity instance);
 
-        bool DeleteVM(string id);
+        ProvisionedVmEntity CreateVM(VMDesignEntity vmDesign, InstanceEntity instance);
 
-        bool TurnOnVM(string id);
+        bool DeleteVM(ProvisionedVmEntity vm);
 
-        bool TurnOffVM(string id);
+        bool TurnOnVM(ProvisionedVmEntity vm);
+
+        bool TurnOffVM(ProvisionedVmEntity vm);
     }
 }

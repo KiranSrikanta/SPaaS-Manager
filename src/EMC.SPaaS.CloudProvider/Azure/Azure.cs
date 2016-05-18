@@ -13,6 +13,7 @@ using Microsoft.WindowsAzure.Management.Compute.Models;
 using Microsoft.WindowsAzure.Management.Storage;
 using Microsoft.WindowsAzure.Management.Storage.Models;
 using Microsoft.WindowsAzure.Management.Models;
+using EMC.SPaaS.Entities;
 
 namespace EMC.SPaaS.CloudProvider
 {
@@ -32,21 +33,20 @@ namespace EMC.SPaaS.CloudProvider
             );
         }
 
-
-        public string CreateVM(string Name)
+        public ProvisionedVmEntity CreateVM(VMDesignEntity vmDesign, InstanceEntity instance)
         {
+            //Configurable
             string storageAccountName = "spaasstorage";
-            
 
-            string hostedService = "spaashost";
-            string hostedServiceLabel = "spaas";
+            string hostedService = instance.Name;//"spaashost";
+            string hostedServiceLabel = instance.Name;//"spaas";
 
-            string vmName = "vm1";
-            string vmUserName = "SPaaSAdmin";
-            string vmPassword = "Welcome@123";
+            string vmName = vmDesign.Name;//"vm1";
+            string vmUserName = vmDesign.UserName;//"SPaaSAdmin";
+            string vmPassword = vmDesign.Password;//"Welcome@123";
+            string vmSize = vmDesign.Type;
 
-            string deploymentName = "testdeploy";
-
+            string deploymentName = instance.Name + vmDesign.Name;// "testdeploy";
 
             try
             {
@@ -81,7 +81,8 @@ namespace EMC.SPaaS.CloudProvider
                 using (var computeClient = new ComputeManagementClient(Credentials))
                 {
                     var operatingSystemImageListResult = computeClient.VirtualMachineOSImages.List().Images;
-                    var imageName = operatingSystemImageListResult.FirstOrDefault().Name;
+                    //Configurable??
+                    var imageName = operatingSystemImageListResult.FirstOrDefault(os => os.Label.Contains(vmDesign.Name)).Name;
 
                     //OS config
                     var windowsConfigSet = new ConfigurationSet
@@ -130,7 +131,7 @@ namespace EMC.SPaaS.CloudProvider
                         RoleName = vmName,
 
                         //Make configurable
-                        RoleSize = VirtualMachineRoleSize.Small,
+                        RoleSize = vmSize,//VirtualMachineRoleSize.Small,
                         RoleType = VirtualMachineRoleType.PersistentVMRole.ToString(),
                         OSVirtualHardDisk = vhd,
                         ConfigurationSets = new List<ConfigurationSet> { windowsConfigSet, networkConfigSet },
@@ -150,11 +151,16 @@ namespace EMC.SPaaS.CloudProvider
 
                     //create the vm
                     var deploymentResult = computeClient.VirtualMachines.CreateDeployment(hostedService, deploymentParameters);
-                    
+
                     computeClient.VirtualMachines.Get("", "", "");
                     computeClient.Deployments.GetByName("", "");
 
-                    return deploymentResult.RequestId;
+                    return new ProvisionedVmEntity {
+                        Instance = instance,
+                        Name = deploymentName,
+                        StatusId = (int)ProvisionedVmStatus.Busy,
+                        VmId = deploymentResult.RequestId
+                    };
                 }
             }
             catch (Exception ex)
@@ -162,19 +168,20 @@ namespace EMC.SPaaS.CloudProvider
                 throw ex;
             }
 
+            throw new NotImplementedException();
         }
 
-        public bool DeleteVM(string id)
+        public bool DeleteVM(ProvisionedVmEntity vm)
         {
             throw new NotImplementedException();
         }
 
-        public bool TurnOffVM(string id)
+        public bool TurnOnVM(ProvisionedVmEntity vm)
         {
             throw new NotImplementedException();
         }
 
-        public bool TurnOnVM(string id)
+        public bool TurnOffVM(ProvisionedVmEntity vm)
         {
             throw new NotImplementedException();
         }
@@ -183,10 +190,36 @@ namespace EMC.SPaaS.CloudProvider
         {
             List<IServer> serverOptionsList = new List<IServer>(3);
 
-            serverOptionsList.Add(new AzureServer() { Name = "A1", Processors = 4, RAM = 7 });
-            serverOptionsList.Add(new AzureServer() { Name = "A2", Processors = 2, RAM = 3 });
+            //Not Real
+            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.ExtraSmall, Processors = "shared core", RAM = "768 MB" });
+            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.Small, Processors = "1 core", RAM = "1.75 GB" });
+            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.Medium, Processors = "2 cores", RAM = "3.5 GB" });
+            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.Large, Processors = "4 cores", RAM = "7 GB" });
+            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.ExtraLarge, Processors = "8 cores", RAM = "14 GB" });
+            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.A5, Processors = "2 cores", RAM = "14 GB" });
+            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.A6, Processors = "4 cores", RAM = "28 GB" });
+            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.A7, Processors = "8 cores", RAM = "56 GB" });
+            //serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.A8, Processors = 2, RAM = 3 });
+            //serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.A9, Processors = 2, RAM = 3 });
 
             return serverOptionsList.ToArray();
+        }
+
+        public void Initialize(InstanceEntity instance)
+        {
+            string hostedService = instance.Name;//"spaashost";
+            string hostedServiceLabel = instance.Name;//"spaas";
+
+            //create cloud service
+            using (var computeClient = new ComputeManagementClient(Credentials))
+            {
+                computeClient.HostedServices.Create(new HostedServiceCreateParameters
+                {
+                    Label = hostedServiceLabel,
+                    Location = LocationNames.WestUS,
+                    ServiceName = hostedService
+                });
+            }
         }
 
         class AzureServer : IServer
@@ -196,12 +229,12 @@ namespace EMC.SPaaS.CloudProvider
                 get; set;
             }
 
-            public int Processors
+            public string Processors
             {
                 get; set;
             }
 
-            public int RAM
+            public string RAM
             {
                 get; set;
             }

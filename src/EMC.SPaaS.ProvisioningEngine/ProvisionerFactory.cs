@@ -6,6 +6,7 @@ using EMC.SPaaS.CloudProvider;
 using Microsoft.Extensions.Configuration;
 using EMC.SPaaS.Utility;
 using EMC.SPaaS.Entities;
+using EMC.SPaaS.Repository;
 
 namespace EMC.SPaaS.ProvisioningEngine
 {
@@ -16,16 +17,14 @@ namespace EMC.SPaaS.ProvisioningEngine
         {
             AuthenticationConfiguration = authConfiguration;
         }
-        public IProvisioner CreateProvisioner(UserEntity User)
+        public IProvisioner CreateProvisioner(UserEntity User, RepositoryManager repositories)
         {
             //TODO: IMPLEMENT STRATAGY PATTERN
             if (User.AuthenticationProvider == GlobalConstants.CloudProviders.Azure.Name)
             {
                 var azureCloudProvider = new Azure(AuthenticationConfiguration.GetSection(GlobalConstants.CloudProviders.Azure.Name), User.AccessToken);
 
-                azureCloudProvider.CreateVM("AAA");
-
-                return new Provisioner(azureCloudProvider);
+                return new Provisioner(azureCloudProvider, repositories);
             }
             else
                 return null;

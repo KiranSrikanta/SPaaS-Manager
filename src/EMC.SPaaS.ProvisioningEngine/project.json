@@ -12,6 +12,7 @@
     "EMC.SPaaS.CloudProvider": "1.0.0-*",
     "EMC.SPaaS.DesignManager": "1.0.0-*",
     "EMC.SPaaS.Entities": "1.0.0-*",
+    "EMC.SPaaS.RepositoryManager": "1.0.0-*",
     "EMC.SPaaS.Utility": "1.0.0-*"
   }
 }

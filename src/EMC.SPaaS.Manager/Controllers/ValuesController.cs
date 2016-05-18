@@ -29,22 +29,6 @@ namespace EMC.SPaaS.Manager.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-
-            //TODO: PASS IN LOGGED IN USER'S SUBSCRIPTION!
-
-            try
-            {
-                var sUserId = User.FindAll(Constants.AuthenticationSession.Properties.UserId).FirstOrDefault().Value;
-                int userId = int.Parse(sUserId);
-                var user = DbContext.Users.FirstOrDefault(u => u.Id == userId);
-                var Provisioner = ProvisioningFactory.CreateProvisioner(user);
-            }
-            catch (Exception)
-            {
-                
-            }
-            //var Provisioner = ProvisioningFactory.CreateProvisioner(User);
-
             return new string[] { "value1", "value2" };
         }
 

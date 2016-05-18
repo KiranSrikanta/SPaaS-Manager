@@ -14,9 +14,9 @@ namespace EMC.SPaaS.DesignManager
     {
         string Name { get; set; }
         
-        int RAM { get; }
+        string RAM { get; }
 
-        int Processors { get; }
+        string Processors { get; }
     }
 
     public interface IServerBluePrint

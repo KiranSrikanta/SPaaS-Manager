@@ -5,20 +5,30 @@ using System.Threading.Tasks;
 using EMC.SPaaS.CloudProvider;
 using EMC.SPaaS.DesignManager;
 using EMC.SPaaS.Entities;
+using EMC.SPaaS.Repository;
 
 namespace EMC.SPaaS.ProvisioningEngine
 {
     public class Provisioner : IProvisioner
     {
         ICloudProvider _cloudProvider;
+        RepositoryManager _repositories;
 
-        public Provisioner(ICloudProvider CloudProvider)
+        public Provisioner(ICloudProvider CloudProvider, RepositoryManager repositories)
         {
             _cloudProvider = CloudProvider;
+            _repositories = repositories;
         }
 
-        public int CreateInstance(DesignEntity design)
+        public int CreateInstance(InstanceEntity instance)
         {
+            _cloudProvider.Initialize(instance);
+
+            var vm = new VMDesignEntity();
+            var provisionedVM = _cloudProvider.CreateVM(vm, instance);
+            _repositories.Instances.AddVM(instance, provisionedVM);
+            _repositories.Save();
+
             //foreach(var serverBP in design.ServerBluePrints)
             //{
             //    _cloudProvider.CreateVM(serverBP.Server.Name);

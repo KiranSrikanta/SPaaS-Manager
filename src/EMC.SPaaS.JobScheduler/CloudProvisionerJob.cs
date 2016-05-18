@@ -24,7 +24,7 @@ namespace EMC.SPaaS.JobScheduler
             var provisionerFactory = new ProvisionerFactory(rootConfig.GetSection("Authentication"));
             foreach (var job in jobs)
             {
-                var provisioner = provisionerFactory.CreateProvisioner(job.User);
+                var provisioner = provisionerFactory.CreateProvisioner(job.User, Repositories);
 
                 Repositories.Jobs.UpdateStatus(job, JobStatus.InProgress);
                 Repositories.Save();
@@ -32,7 +32,7 @@ namespace EMC.SPaaS.JobScheduler
                 switch ((JobType)job.TypeId)
                 {
                     case JobType.Provision:
-                        provisioner.CreateInstance(job.Instance.Design);
+                        provisioner.CreateInstance(job.Instance);
                         break;
                     case JobType.Release:
                         provisioner.DeleteInstance(job.InstanceId);
