@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0-*",
+  "description": "EMC.SPaaS.JobScheduler Class Library",
+  "authors": [ "srikak" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "net451": { }
+  },
+  "dependencies": {
+    "EMC.SPaaS.Entities": "1.0.0-*",
+    "EMC.SPaaS.ProvisioningEngine": "1.0.0-*",
+    "EMC.SPaaS.RepositoryManager": "1.0.0-*",
+    "Quartz": "2.3.3"
+  }
+}

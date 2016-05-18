@@ -36,6 +36,13 @@ namespace EMC.SPaaS.Repository
                 return new VMDesignRepository(Context);
             }
         }
+        public IInstanceRepository Instances
+        {
+            get
+            {
+                return new InstanceRepository(Context);
+            }
+        }
 
         public void Save()
         {

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Data.Entity;
 using EMC.SPaaS.Entities;
 using EMC.SPaaS.AuthenticationProviders;
+using EMC.SPaaS.JobScheduler;
 
 namespace EMC.SPaaS.Manager
 {
@@ -59,11 +60,7 @@ namespace EMC.SPaaS.Manager
                 options.UseNpgsql(connectionString);
             });
 
-            //services.addentityframework().addnpgsql().adddbcontext<repositorycontext>(options =>
-            //{
-            //    options.usenpgsql(connectionstring);
-            //});
-            //services.AddScoped<IRepository<DesignItem, string>, DesignRepository>();
+            QuartzJobScheduler jobScheduler = new QuartzJobScheduler(connectionString);
 
             services.AddMvc();
         }

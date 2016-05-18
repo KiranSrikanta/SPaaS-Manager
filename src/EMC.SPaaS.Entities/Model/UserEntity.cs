@@ -17,5 +17,7 @@ namespace EMC.SPaaS.Entities
         public string UserId { get; set; }
         public string AccessToken { get; set; }
         public string AuthenticationProvider { get; set; }
+        public ICollection<JobEntity> Jobs { get; set; }
+        public ICollection<InstanceEntity> Instances { get; set; }
     }
 }
