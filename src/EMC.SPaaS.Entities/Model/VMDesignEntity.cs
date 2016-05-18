@@ -12,8 +12,12 @@ namespace EMC.SPaaS.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
-        public int DesignID { get; set; }
-        public int UserID { get; set; }
+        public int DId { get; set; }
+        [ForeignKey("DId")]
+        public DesignEntity Design { get; set; }
+        public int UserId { get; set; }
+        [ForeignKey("UserId")]
+        public UserEntity User { get; set; }
         public string Name { get; set; }
         public string OS { get; set; }
         public string UserName { get; set; }
