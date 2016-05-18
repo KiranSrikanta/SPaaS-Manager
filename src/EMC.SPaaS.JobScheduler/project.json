@@ -12,6 +12,8 @@
     "EMC.SPaaS.Entities": "1.0.0-*",
     "EMC.SPaaS.ProvisioningEngine": "1.0.0-*",
     "EMC.SPaaS.RepositoryManager": "1.0.0-*",
+    "Microsoft.Extensions.Configuration.FileProviderExtensions": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
     "Quartz": "2.3.3"
   }
 }

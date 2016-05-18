@@ -4,6 +4,7 @@ using Microsoft.Data.Entity.Infrastructure;
 using EMC.SPaaS.Entities;
 using Microsoft.Data.Entity;
 using EMC.SPaaS.ProvisioningEngine;
+using Microsoft.Extensions.Configuration;
 
 namespace EMC.SPaaS.JobScheduler
 {
@@ -17,9 +18,33 @@ namespace EMC.SPaaS.JobScheduler
                 dataMap.GetString(Constants.PropertyKeys.ConnectionString)
             );
 
-            var user = Repositories.Users.GetUser(1);
-            
-            throw new NotImplementedException();
+            var jobs = Repositories.Jobs.GetJobByStatus(JobStatus.NotStarted);
+
+            var rootConfig = GetConfiguration();
+            var provisionerFactory = new ProvisionerFactory(rootConfig.GetSection("Authentication"));
+            foreach (var job in jobs)
+            {
+                var provisioner = provisionerFactory.CreateProvisioner(job.User);
+
+                Repositories.Jobs.UpdateStatus(job, JobStatus.InProgress);
+                Repositories.Save();
+
+                switch ((JobType)job.TypeId)
+                {
+                    case JobType.Provision:
+                        provisioner.CreateInstance(job.Instance.Design);
+                        break;
+                    case JobType.Release:
+                        provisioner.DeleteInstance(job.InstanceId);
+                        break;
+                    case JobType.TurnOff:
+                        provisioner.TurnOffInstance(job.InstanceId);
+                        break;
+                    case JobType.TurnOn:
+                        provisioner.TurnOnInstance(job.InstanceId);
+                        break;
+                }
+            }
         }
 
         Repository.RepositoryManager CreateRepositoryManagerFromConnectionString(string connectionString)
@@ -31,6 +56,14 @@ namespace EMC.SPaaS.JobScheduler
             SPaaSDbContext dbContext = new SPaaSDbContext(dbOptions.Options);
 
             return new Repository.RepositoryManager(dbContext);
+        }
+
+        IConfigurationRoot GetConfiguration()
+        {
+            
+            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
+            
+            return builder.Build();
         }
     }
 }

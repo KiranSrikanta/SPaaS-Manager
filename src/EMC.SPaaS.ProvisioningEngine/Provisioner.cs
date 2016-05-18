@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EMC.SPaaS.CloudProvider;
 using EMC.SPaaS.DesignManager;
+using EMC.SPaaS.Entities;
 
 namespace EMC.SPaaS.ProvisioningEngine
 {
@@ -16,17 +17,17 @@ namespace EMC.SPaaS.ProvisioningEngine
             _cloudProvider = CloudProvider;
         }
 
-        public int CreateInstance(IDesign design)
+        public int CreateInstance(DesignEntity design)
         {
-            foreach(var serverBP in design.ServerBluePrints)
-            {
-                _cloudProvider.CreateVM(serverBP.Server.Name);
+            //foreach(var serverBP in design.ServerBluePrints)
+            //{
+            //    _cloudProvider.CreateVM(serverBP.Server.Name);
 
-                //TODO:INSTALL CHEF
-                var configFile = serverBP.GetXmlConfigurationFile();
+            //    //TODO:INSTALL CHEF
+            //    var configFile = serverBP.GetXmlConfigurationFile();
 
-                //TODO:RUN CHEF WITH CONFIGURATIO?
-            }
+            //    //TODO:RUN CHEF WITH CONFIGURATIO?
+            //}
 
 
 

@@ -36,6 +36,13 @@ namespace EMC.SPaaS.Repository
                 return new InstanceRepository(Context);
             }
         }
+        public IJobRepository Jobs
+        {
+            get
+            {
+                return new JobRepository(Context);
+            }
+        }
         public IVMDesignRepository VMDesigns
         {
             get
