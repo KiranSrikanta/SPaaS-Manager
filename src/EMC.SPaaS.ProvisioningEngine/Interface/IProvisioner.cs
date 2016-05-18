@@ -5,7 +5,7 @@ namespace EMC.SPaaS.ProvisioningEngine
 {
     public interface IProvisioner
     {
-        int CreateInstance(InstanceEntity instance);
+        void CreateInstance(InstanceEntity instance);
 
         bool TurnOnInstance(int instanceId);
 

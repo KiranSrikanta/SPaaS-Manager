@@ -20,14 +20,17 @@ namespace EMC.SPaaS.ProvisioningEngine
             _repositories = repositories;
         }
 
-        public int CreateInstance(InstanceEntity instance)
+        public void CreateInstance(InstanceEntity instance)
         {
             _cloudProvider.Initialize(instance);
 
-            var vm = new VMDesignEntity();
-            var provisionedVM = _cloudProvider.CreateVM(vm, instance);
-            _repositories.Instances.AddVM(instance, provisionedVM);
-            _repositories.Save();
+            foreach(var vm in instance.Design.VMs)
+            {
+                var provisionedVM = _cloudProvider.CreateVM(vm, instance);
+                _repositories.Instances.AddVM(instance, provisionedVM);
+                _repositories.Save();
+            }
+            
 
             //foreach(var serverBP in design.ServerBluePrints)
             //{
@@ -38,11 +41,6 @@ namespace EMC.SPaaS.ProvisioningEngine
 
             //    //TODO:RUN CHEF WITH CONFIGURATIO?
             //}
-
-
-
-            //TODO:SAVE INSTANCE DETAILS FROM DB
-            throw new NotImplementedException();
         }
 
         public bool TurnOnInstance(int instanceId)
