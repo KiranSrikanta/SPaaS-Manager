@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using EMC.SPaaS.Entities;
 using EMC.SPaaS.Repository;
-
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace EMC.SPaaS.Manager.Controllers
@@ -29,15 +30,24 @@ namespace EMC.SPaaS.Manager.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public DesignEntity Get(int id)
         {
-            return Repositories.Designs.Find(id).DesignName;
+            return Repositories.Designs.Find(id);
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public void Post([FromBody] JObject itemDesign)
         {
+            if(itemDesign != null)
+            {
+                dynamic jsonData = itemDesign;
+                var objDesign = jsonData.Designs["compDesign"][0].ToObject<DesignEntity>();
+                var objVMDesign = jsonData.Designs["compVMDesign"][0].ToObject<VMDesignEntity>();
+
+                Repositories.Designs.Add(objDesign);
+                Repositories.VMDesigns.Add(objVMDesign);
+            }
         }
 
         // PUT api/values/5
