@@ -20,24 +20,25 @@ namespace EMC.SPaaS.Repository
             
             //Save to DB
             _context.Designs.Add(nItem);
-            _context.SaveChanges();
+            
         }
 
         public DesignEntity Find(int designID)
         {
-            return _context.Designs.FirstOrDefault(s => s.Id == designID);
+            return _context.Designs.FirstOrDefault(s => s.DId == designID);
         }
 
         public IEnumerable<DesignEntity> GetAll(int userID)
         {
             //return designItems.Values;
-            return _context.Designs.Where(d => d.UserID == userID);
+           
+            return _context.Designs.Where(d => d.UserId == userID);
                 
         }
 
         public void Remove(int designID)
         {
-           var design = _context.Designs.FirstOrDefault(s => s.Id == designID);
+           var design = _context.Designs.FirstOrDefault(s => s.DId == designID);
             _context.Designs.Remove(design);
 
         }

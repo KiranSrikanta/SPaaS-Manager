@@ -47,6 +47,8 @@ namespace EMC.SPaaS.Manager.Controllers
 
                 Repositories.Designs.Add(objDesign);
                 Repositories.VMDesigns.Add(objVMDesign);
+
+                Repositories.Save();
             }
         }
 
