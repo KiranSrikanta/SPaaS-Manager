@@ -31,7 +31,8 @@ namespace EMC.SPaaS.Repository
         public IEnumerable<DesignEntity> GetAll(int userID)
         {
             //return designItems.Values;
-            throw new NotImplementedException();
+            return _context.Designs.Where(d => d.UserID == userID);
+                
         }
 
         public void Remove(int designID)

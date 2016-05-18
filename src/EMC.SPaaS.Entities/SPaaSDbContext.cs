@@ -1,28 +1,21 @@
 ﻿using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity.Infrastructure;
 
 namespace EMC.SPaaS.Entities
 {
     public class SPaaSDbContext : DbContext
     {
-        public SPaaSDbContext() : base()
-        {
-            Database.EnsureCreated();
-            
-            Database.Migrate();
-        }
-
+       
         public SPaaSDbContext(DbContextOptions options) : base(options)
         {
             Database.EnsureCreated();
 
             Database.Migrate();
         }
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,8 +24,12 @@ namespace EMC.SPaaS.Entities
         }
 
         public DbSet<UserEntity> Users { get; set; }
-
+        
         public DbSet<DesignEntity> Designs { get; set; }
+
+        public DbSet<VMDesignEntity> VMDesigns { get; set; }
+
+       
 
         public DbSet<InstanceEntity> Instances { get; set; }
         public DbSet<InstanceStatusEntity> InstanceStatuses { get; set; }

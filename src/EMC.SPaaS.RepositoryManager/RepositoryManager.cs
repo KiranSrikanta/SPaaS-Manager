@@ -43,6 +43,13 @@ namespace EMC.SPaaS.Repository
                 return new JobRepository(Context);
             }
         }
+        public IVMDesignRepository VMDesigns
+        {
+            get
+            {
+                return new VMDesignRepository(Context);
+            }
+        }
 
         public void Save()
         {
