@@ -9,6 +9,8 @@ namespace EMC.SPaaS.Repository
         void Delete(InstanceEntity instance);
         IEnumerable<InstanceEntity> GetInstancesForUser(int userId);
         InstanceEntity GetInstance(int instanceId, int userId);
+        void CreateJob(InstanceEntity instance, JobType jobType, UserEntity user);
+        void CreateJob(InstanceEntity instance, JobType jobType, int userId);
         void Provision(InstanceEntity instance, UserEntity user);
         void Provision(InstanceEntity instance, int userId);
         void TurnOff(InstanceEntity instance, UserEntity user);

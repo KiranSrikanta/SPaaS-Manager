@@ -24,30 +24,45 @@ namespace EMC.SPaaS.Manager.Controllers
         // GET: api/values
         [HttpGet]
         [Authorize]
-        public IEnumerable<string> Get()
+        public JsonResult Get()
         {
             var sUserId = User.FindAll(Constants.AuthenticationSession.Properties.UserId).FirstOrDefault().Value;
             int userId = int.Parse(sUserId);
 
             var instances = Repositories.Instances.GetInstancesForUser(userId);
 
-            return from i in instances select i.Name;
+            return new JsonResult(instances);
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         [Authorize]
-        public string Get(int id)
+        public JsonResult Get(int id)
         {
             var sUserId = User.FindAll(Constants.AuthenticationSession.Properties.UserId).FirstOrDefault().Value;
             int userId = int.Parse(sUserId);
 
             var instance = Repositories.Instances.GetInstance(id, userId);
 
-            return instance.Name;
+            return new JsonResult(instance);
         }
 
         // POST api/values
+        [HttpPost("{id}/{jobType}")]
+        [Authorize]
+        public void Post(int id, int jobType)
+        {
+            JobType type = (JobType)jobType;
+
+            var sUserId = User.FindAll(Constants.AuthenticationSession.Properties.UserId).FirstOrDefault().Value;
+            int userId = int.Parse(sUserId);
+
+            var instance = Repositories.Instances.GetInstance(id, userId);
+            Repositories.Instances.CreateJob(instance, type, userId);
+
+            Repositories.Save();
+        }
+
         [HttpPost]
         [Authorize]
         public void Post([FromBody]int designId, [FromBody]string name)

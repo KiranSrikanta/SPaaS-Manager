@@ -38,13 +38,7 @@ namespace EMC.SPaaS.Repository
 
         public void Provision(InstanceEntity instance, UserEntity user)
         {
-            Context.Jobs.Add(new JobEntity
-            {
-                Instance = instance,
-                StatusId = (int)JobStatus.NotStarted,
-                TypeId = (int)JobType.Provision,
-                User = user
-            });
+            Provision(instance, user.Id);
 
             //Create VMs!!
         }
@@ -62,13 +56,7 @@ namespace EMC.SPaaS.Repository
 
         public void Release(InstanceEntity instance, UserEntity user)
         {
-            Context.Jobs.Add(new JobEntity
-            {
-                Instance = instance,
-                StatusId = (int)JobStatus.NotStarted,
-                TypeId = (int)JobType.Provision,
-                User = user
-            });
+            Release(instance, user.Id);
 
             //Create VMs!!
         }
@@ -86,13 +74,7 @@ namespace EMC.SPaaS.Repository
 
         public void TurnOff(InstanceEntity instance, UserEntity user)
         {
-            Context.Jobs.Add(new JobEntity
-            {
-                Instance = instance,
-                StatusId = (int)JobStatus.NotStarted,
-                TypeId = (int)JobType.Release,
-                User = user
-            });
+            TurnOff(instance, user.Id);
         }
 
         public void TurnOff(InstanceEntity instance, int userId)
@@ -108,13 +90,7 @@ namespace EMC.SPaaS.Repository
 
         public void TurnOn(InstanceEntity instance, UserEntity user)
         {
-            Context.Jobs.Add(new JobEntity
-            {
-                Instance = instance,
-                StatusId = (int)JobStatus.NotStarted,
-                TypeId = (int)JobType.TurnOn,
-                User = user
-            });
+            TurnOn(instance, user.Id);
         }
 
         public void TurnOn(InstanceEntity instance, int userId)
@@ -126,6 +102,32 @@ namespace EMC.SPaaS.Repository
                 TypeId = (int)JobType.TurnOn,
                 UserId = userId
             });
+        }
+
+        public void CreateJob(InstanceEntity instance, JobType jobType, UserEntity user)
+        {
+            CreateJob(instance, jobType, user.Id);
+        }
+
+        public void CreateJob(InstanceEntity instance, JobType jobType, int userId)
+        {
+            switch (jobType)
+            {
+                case JobType.Provision:
+                    Provision(instance, userId);
+                    break;
+                case JobType.Release:
+                    Release(instance, userId);
+                    break;
+                case JobType.TurnOff:
+                    TurnOff(instance, userId);
+                    break;
+                case JobType.TurnOn:
+                    TurnOn(instance, userId);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(jobType));
+            }
         }
     }
 }
