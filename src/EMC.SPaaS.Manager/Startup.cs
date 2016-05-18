@@ -84,6 +84,96 @@ namespace EMC.SPaaS.Manager
             app.UseJsonWebTokenAuthorization();
 
             app.UseMvc();
+
+            using (var context = (SPaaSDbContext)app.ApplicationServices.GetService<SPaaSDbContext>())
+            {
+                if (env.IsDevelopment())
+                {
+                    #region Job Status
+                    if (context.JobStatuses.Count() == 0)
+                    {
+                        context.JobStatuses.Add(new JobStatusEntity
+                        {
+                            Id = (int)JobStatus.NotStarted,
+                            Status = "Not Started"
+                        });
+                        context.JobStatuses.Add(new JobStatusEntity
+                        {
+                            Id = (int)JobStatus.InProgress,
+                            Status = "In Progress"
+                        });
+                        context.JobStatuses.Add(new JobStatusEntity
+                        {
+                            Id = (int)JobStatus.Successful,
+                            Status = "Successful"
+                        });
+                        context.JobStatuses.Add(new JobStatusEntity
+                        {
+                            Id = (int)JobStatus.Failed,
+                            Status = "Failed"
+                        });
+
+                        context.SaveChanges();
+                    }
+                    #endregion
+
+                    #region Instance Status
+                    if (context.InstanceStatuses.Count() == 0)
+                    {
+                        context.InstanceStatuses.Add(new InstanceStatusEntity
+                        {
+                            Id = (int)InstanceStatus.NotProvisioned,
+                            Status = "Not Provisioned"
+                        });
+                        context.InstanceStatuses.Add(new InstanceStatusEntity
+                        {
+                            Id = (int)InstanceStatus.Busy,
+                            Status = "Busy"
+                        });
+                        context.InstanceStatuses.Add(new InstanceStatusEntity
+                        {
+                            Id = (int)InstanceStatus.TurnedOn,
+                            Status = "Turned On"
+                        });
+                        context.InstanceStatuses.Add(new InstanceStatusEntity
+                        {
+                            Id = (int)InstanceStatus.TurnedOff,
+                            Status = "Turned Off"
+                        });
+
+                        context.SaveChanges();
+                    }
+                    #endregion
+
+                    #region Job Type
+                    if (context.JobTypes.Count() == 0)
+                    {
+                        context.JobTypes.Add(new JobTypeEntity
+                        {
+                            Id = (int)JobType.Provision,
+                            Type = "Provision"
+                        });
+                        context.JobTypes.Add(new JobTypeEntity
+                        {
+                            Id = (int)JobType.Release,
+                            Type = "Release"
+                        });
+                        context.JobTypes.Add(new JobTypeEntity
+                        {
+                            Id = (int)JobType.TurnOn,
+                            Type = "Turn On"
+                        });
+                        context.JobTypes.Add(new JobTypeEntity
+                        {
+                            Id = (int)JobType.TurnOff,
+                            Type = "Turn Off"
+                        });
+
+                        context.SaveChanges();
+                    }
+                    #endregion
+                }
+            }
         }
 
         // Entry point for the application.
