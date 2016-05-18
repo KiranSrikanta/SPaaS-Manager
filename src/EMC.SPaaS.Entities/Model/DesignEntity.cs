@@ -8,7 +8,7 @@ namespace EMC.SPaaS.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int DesignID { get; set; }
+        public int DId { get; set; }
         public string DesignXML { get; set; }
         public int UserId { get; set; }
         [ForeignKey("UserId")]
