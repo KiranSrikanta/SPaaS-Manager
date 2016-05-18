@@ -11,7 +11,7 @@ namespace EMC.SPaaS.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int DesignID { get; set; }
+        public int Id { get; set; }
         public string DesignXML { get; set; }
         public string DesignOwner { get; set; }
         public string DesignName { get; set; }

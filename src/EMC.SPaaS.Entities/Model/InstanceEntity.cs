@@ -37,7 +37,7 @@ namespace EMC.SPaaS.Entities
 
     public enum InstanceStatus
     {
-        NotProvisioned = 0,
+        NotProvisioned = 1,
         TurnedOn,
         TurnedOff,
         Busy

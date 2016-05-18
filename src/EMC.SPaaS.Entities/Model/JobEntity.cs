@@ -36,7 +36,7 @@ namespace EMC.SPaaS.Entities
 
     public enum JobStatus
     {
-        NotStarted = 0,
+        NotStarted = 1,
         InProgress,
         Successful,
         Failed
@@ -54,7 +54,7 @@ namespace EMC.SPaaS.Entities
 
     public enum JobType
     {
-        Provision = 0,
+        Provision = 1,
         Release,
         TurnOn,
         TurnOff

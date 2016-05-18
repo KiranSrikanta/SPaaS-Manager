@@ -25,7 +25,7 @@ namespace EMC.SPaaS.Repository
 
         public DesignEntity Find(int designID)
         {
-            return _context.Designs.FirstOrDefault(s => s.DesignID == designID);
+            return _context.Designs.FirstOrDefault(s => s.Id == designID);
         }
 
         public IEnumerable<DesignEntity> GetAll(int userID)
@@ -36,7 +36,7 @@ namespace EMC.SPaaS.Repository
 
         public void Remove(int designID)
         {
-           var design = _context.Designs.FirstOrDefault(s => s.DesignID == designID);
+           var design = _context.Designs.FirstOrDefault(s => s.Id == designID);
             _context.Designs.Remove(design);
 
         }

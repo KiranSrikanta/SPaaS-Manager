@@ -85,6 +85,7 @@ namespace EMC.SPaaS.Manager
 
             app.UseMvc();
 
+            #region Seed DB
             using (var context = (SPaaSDbContext)app.ApplicationServices.GetService<SPaaSDbContext>())
             {
                 if (env.IsDevelopment())
@@ -97,16 +98,19 @@ namespace EMC.SPaaS.Manager
                             Id = (int)JobStatus.NotStarted,
                             Status = "Not Started"
                         });
+
                         context.JobStatuses.Add(new JobStatusEntity
                         {
                             Id = (int)JobStatus.InProgress,
                             Status = "In Progress"
                         });
+
                         context.JobStatuses.Add(new JobStatusEntity
                         {
                             Id = (int)JobStatus.Successful,
                             Status = "Successful"
                         });
+
                         context.JobStatuses.Add(new JobStatusEntity
                         {
                             Id = (int)JobStatus.Failed,
@@ -173,7 +177,9 @@ namespace EMC.SPaaS.Manager
                     }
                     #endregion
                 }
-            }
+            } 
+
+            #endregion
         }
 
         // Entry point for the application.

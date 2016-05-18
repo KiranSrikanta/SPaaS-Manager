@@ -60,8 +60,10 @@ namespace EMC.SPaaS.JobScheduler
 
         IConfigurationRoot GetConfiguration()
         {
+            
             var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
-            return builder.Build().ReloadOnChanged("appsettings.json");
+            
+            return builder.Build();
         }
     }
 }
