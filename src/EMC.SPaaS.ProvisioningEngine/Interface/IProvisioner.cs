@@ -1,4 +1,5 @@
-﻿using EMC.SPaaS.DesignManager;
+﻿using System.Collections.Generic;
+using EMC.SPaaS.DesignManager;
 using EMC.SPaaS.Entities;
 
 namespace EMC.SPaaS.ProvisioningEngine
@@ -7,10 +8,18 @@ namespace EMC.SPaaS.ProvisioningEngine
     {
         void CreateInstance(InstanceEntity instance);
 
-        bool TurnOnInstance(int instanceId);
+        void CreateInstanceVMs(InstanceEntity instance);
 
-        bool TurnOffInstance(int instanceId);
+        bool TurnOnInstanceVMs(int instanceId);
 
-        bool DeleteInstance(int instanceId);
+        bool TurnOffInstanceVMs(int instanceId);
+
+        bool DeleteInstanceVMs(int instanceId);
+
+        bool IsInstanceRunning(InstanceEntity instance);
+
+        bool IsInstanceOff(InstanceEntity instance);
+
+        IEnumerable<ProvisionedVmEntity> GetProvisionedVMDetails(InstanceEntity instance);
     }
 }

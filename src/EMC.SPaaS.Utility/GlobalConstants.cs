@@ -22,6 +22,7 @@ namespace EMC.SPaaS.Utility
                     public const string ClientSecret = "AzureClientSecret";
                     public const string Resource = "AzureClientResource";
                     public const string SubscriptionId = "AzureSubscriptionId";
+                    public const string StorageAccountName = "AzureStorageAccountName";
                 }
             }
         }

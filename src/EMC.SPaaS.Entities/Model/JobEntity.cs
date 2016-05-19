@@ -32,6 +32,8 @@ namespace EMC.SPaaS.Entities
         public InstanceEntity Instance { get; set; }
 
         public int InstanceId { get; set; }
+
+        public string ErrorDetails { get; set; }
     }
 
     public enum JobStatus

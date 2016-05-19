@@ -39,7 +39,7 @@ namespace EMC.SPaaS.DesignManager
 
     public class SharePointServerBluePrint : IServerBluePrint
     {
-        public IServer Server
+        public Server Server
         {
             get; private set;
         }
