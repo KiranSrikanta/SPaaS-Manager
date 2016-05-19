@@ -24,5 +24,6 @@ namespace EMC.SPaaS.Repository
 
 
         void AddVM(InstanceEntity instance, ProvisionedVmEntity vm);
+        void AddVM(InstanceEntity instance, IEnumerable<ProvisionedVmEntity> vmCollection);
     }
 }

@@ -40,7 +40,10 @@ namespace EMC.SPaaS.Entities
         NotProvisioned = 1,
         TurnedOn,
         TurnedOff,
-        Busy
+        Busy,
+        Provisioning,
+        ChefNodeInstallation,
+        SolutionInstallation
     }
 
     public class InstanceStatusEntity

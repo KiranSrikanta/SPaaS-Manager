@@ -10,18 +10,24 @@ namespace EMC.SPaaS.DesignManager
         IEnumerable<IServerBluePrint> ServerBluePrints { get; }
     }
 
-    public interface IServer
+    public class Server
     {
-        string Name { get; set; }
-        
-        string RAM { get; }
+        public Server(string Name, string RAM, string Processors)
+        {
+            this.Name = Name;
+            this.RAM = RAM;
+            this.Processors = Processors;
+        }
+        public string Name { get; protected set; }
 
-        string Processors { get; }
+        public string RAM { get; protected set; }
+
+        public string Processors { get; protected set; }
     }
 
     public interface IServerBluePrint
     {
-        IServer Server { get; }
+        Server Server { get; }
 
         System.Xml.XmlDocument GetXmlConfigurationFile();
     }

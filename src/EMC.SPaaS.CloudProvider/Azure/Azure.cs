@@ -19,6 +19,9 @@ namespace EMC.SPaaS.CloudProvider
 {
     public class Azure : ICloudProvider
     {
+        //TODO:CONFIG
+        readonly string storageAccountName = "spaasstorage";
+
         SubscriptionCloudCredentials Credentials { get; set; }
 
         IAuthenticationProvider OAuthProvider { get; set; }
@@ -33,23 +36,23 @@ namespace EMC.SPaaS.CloudProvider
             );
         }
 
-        public ProvisionedVmEntity CreateVM(VMDesignEntity vmDesign, InstanceEntity instance)
+        public void CreateVM(InstanceEntity instance)
         {
-            //Configurable
-            string storageAccountName = "spaasstorage";
+            #region vars
+            //string hostedService = instance.Name;//"spaashost";
+            //string hostedServiceLabel = instance.Name;//"spaas";
 
-            string hostedService = instance.Name;//"spaashost";
-            string hostedServiceLabel = instance.Name;//"spaas";
+            //string vmName = vmDesign.Name;//"vm1";
+            //string vmUserName = vmDesign.UserName;//"SPaaSAdmin";
+            //string vmPassword = vmDesign.Password;//"Welcome@123";
+            //string vmSize = vmDesign.Type;
 
-            string vmName = vmDesign.Name;//"vm1";
-            string vmUserName = vmDesign.UserName;//"SPaaSAdmin";
-            string vmPassword = vmDesign.Password;//"Welcome@123";
-            string vmSize = vmDesign.Type;
-
-            string deploymentName = instance.Name + vmDesign.Name;// "testdeploy";
+            //string deploymentName = instance.Name + vmDesign.Name;// "testdeploy"; 
+            #endregion
 
             try
             {
+                #region init
                 //DONE Works!
                 //storage account
                 //using (var storageClient = new StorageManagementClient(Credentials))
@@ -74,31 +77,121 @@ namespace EMC.SPaaS.CloudProvider
                 //        Location = LocationNames.WestUS,
                 //        ServiceName = hostedService
                 //    });
-                //}
+                //} 
+                #endregion
 
 
                 //create vm
                 using (var computeClient = new ComputeManagementClient(Credentials))
                 {
                     var operatingSystemImageListResult = computeClient.VirtualMachineOSImages.List().Images;
-                    //Configurable??
-                    var imageName = operatingSystemImageListResult.FirstOrDefault(os => os.Label.Contains(vmDesign.Name)).Name;
 
-                    //OS config
-                    var windowsConfigSet = new ConfigurationSet
+                    var vmRoles = GetAzureRolesForVmDesignes(instance, operatingSystemImageListResult);
+
+                    #region commented
+
+                    //Configurable??
+                    //var imageName = operatingSystemImageListResult.FirstOrDefault(os => os.Label.Contains(vmDesign.Name)).Name;
+
+                    ////OS config
+                    //var windowsConfigSet = new ConfigurationSet
+                    //{
+                    //    ConfigurationSetType = ConfigurationSetTypes.WindowsProvisioningConfiguration,
+                    //    AdminPassword = vmPassword,
+                    //    AdminUserName = vmUserName,
+                    //    ComputerName = vmName,
+                    //    HostName = string.Format("{0}.cloudapp.net", hostedService)
+                    //};
+
+                    ////remote powershell and rdp
+                    //var networkConfigSet = new ConfigurationSet
+                    //{
+                    //    ConfigurationSetType = "NetworkConfiguration",
+                    //    InputEndpoints = new List<InputEndpoint>
+                    //      {
+                    //        new InputEndpoint
+                    //        {
+                    //          Name = "PowerShell",
+                    //          LocalPort = 5986,
+                    //          Protocol = "tcp",
+                    //          Port = 5986,
+                    //        },
+                    //        new InputEndpoint
+                    //        {
+                    //          Name = "Remote Desktop",
+                    //          LocalPort = 3389,
+                    //          Protocol = "tcp",
+                    //          Port = 3389,
+                    //        }
+                    //      }
+                    //};
+
+                    ////virtual harddisk
+                    //var vhd = new OSVirtualHardDisk
+                    //{
+                    //    SourceImageName = imageName,
+                    //    HostCaching = VirtualHardDiskHostCaching.ReadWrite,
+                    //    MediaLink = new Uri(string.Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd", storageAccountName, imageName))
+                    //};
+
+                    ////vm configuration
+                    //var vmAttributes = new Role
+                    //{
+                    //    RoleName = vmName,
+
+                    //    //Make configurable
+                    //    RoleSize = vmSize,//VirtualMachineRoleSize.Small,
+                    //    RoleType = VirtualMachineRoleType.PersistentVMRole.ToString(),
+                    //    OSVirtualHardDisk = vhd,
+                    //    ConfigurationSets = new List<ConfigurationSet> { windowsConfigSet, networkConfigSet },
+
+                    //    //Optional?
+                    //    ProvisionGuestAgent = true
+                    //}; 
+                    #endregion
+
+                    //deployment config
+                    var deploymentParameters = new VirtualMachineCreateDeploymentParameters
                     {
-                        ConfigurationSetType = ConfigurationSetTypes.WindowsProvisioningConfiguration,
-                        AdminPassword = vmPassword,
-                        AdminUserName = vmUserName,
-                        ComputerName = vmName,
-                        HostName = string.Format("{0}.cloudapp.net", hostedService)
+                        Name = instance.Design.DesignName + instance.Name,
+                        Label = instance.Design.DesignName + instance.Name,
+                        DeploymentSlot = DeploymentSlot.Production,
+                        Roles = vmRoles
                     };
 
-                    //remote powershell and rdp
-                    var networkConfigSet = new ConfigurationSet
-                    {
-                        ConfigurationSetType = "NetworkConfiguration",
-                        InputEndpoints = new List<InputEndpoint>
+                    //create VMs
+                    var deploymentResult = computeClient.VirtualMachines.CreateDeployment(instance.Name, deploymentParameters);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private List<Role> GetAzureRolesForVmDesignes(InstanceEntity instance, IList<VirtualMachineOSImageListResponse.VirtualMachineOSImage> images)
+        {
+            List<Role> roles = new List<Role>();
+
+            foreach (var vmDesign in instance.Design.VMs)
+            {
+                var imageName = images.FirstOrDefault(os => os.Label.Contains(vmDesign.Name)).Name;
+
+                //OS config
+                var windowsConfigSet = new ConfigurationSet
+                {
+                    ConfigurationSetType = ConfigurationSetTypes.WindowsProvisioningConfiguration,
+                    AdminPassword = vmDesign.Password,
+                    AdminUserName = vmDesign.UserName,
+                    ComputerName = vmDesign.Name,
+                    HostName = string.Format("{0}.cloudapp.net", instance.Name)
+                };
+
+                //remote powershell and rdp
+                var networkConfigSet = new ConfigurationSet
+                {
+                    ConfigurationSetType = "NetworkConfiguration",
+                    InputEndpoints = new List<InputEndpoint>
                           {
                             new InputEndpoint
                             {
@@ -115,60 +208,53 @@ namespace EMC.SPaaS.CloudProvider
                               Port = 3389,
                             }
                           }
-                    };
+                };
 
-                    //virtual harddisk
-                    var vhd = new OSVirtualHardDisk
-                    {
-                        SourceImageName = imageName,
-                        HostCaching = VirtualHardDiskHostCaching.ReadWrite,
-                        MediaLink = new Uri(string.Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd", storageAccountName, imageName))
-                    };
+                //virtual harddisk
+                var vhd = new OSVirtualHardDisk
+                {
+                    SourceImageName = imageName,
+                    HostCaching = VirtualHardDiskHostCaching.ReadWrite,
+                    MediaLink = new Uri(string.Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd", storageAccountName, imageName))
+                };
 
-                    //vm configuration
-                    var vmAttributes = new Role
-                    {
-                        RoleName = vmName,
+                //vm configuration
+                var vmAttributes = new Role
+                {
+                    RoleName = vmDesign.Name,
 
-                        //Make configurable
-                        RoleSize = vmSize,//VirtualMachineRoleSize.Small,
-                        RoleType = VirtualMachineRoleType.PersistentVMRole.ToString(),
-                        OSVirtualHardDisk = vhd,
-                        ConfigurationSets = new List<ConfigurationSet> { windowsConfigSet, networkConfigSet },
+                    //Make configurable
+                    RoleSize = vmDesign.Type,//VirtualMachineRoleSize.Small,
+                    RoleType = VirtualMachineRoleType.PersistentVMRole.ToString(),
+                    OSVirtualHardDisk = vhd,
+                    ConfigurationSets = new List<ConfigurationSet> { windowsConfigSet, networkConfigSet },
 
-                        //Optional?
-                        ProvisionGuestAgent = true
-                    };
+                    //Optional?
+                    ProvisionGuestAgent = true
+                };
 
-                    //deployment config
-                    var deploymentParameters = new VirtualMachineCreateDeploymentParameters
-                    {
-                        Name = deploymentName,
-                        Label = deploymentName,
-                        DeploymentSlot = DeploymentSlot.Production,
-                        Roles = new List<Role> { vmAttributes }
-                    };
-
-                    //create the vm
-                    var deploymentResult = computeClient.VirtualMachines.CreateDeployment(hostedService, deploymentParameters);
-
-                    computeClient.VirtualMachines.Get("", "", "");
-                    computeClient.Deployments.GetByName("", "");
-
-                    return new ProvisionedVmEntity {
-                        Instance = instance,
-                        Name = deploymentName,
-                        StatusId = (int)ProvisionedVmStatus.Busy,
-                        VmId = deploymentResult.RequestId
-                    };
-                }
+                roles.Add(vmAttributes);
             }
-            catch (Exception ex)
+
+            return roles;
+        }
+
+        public bool IsDeployedInstanceRunning(InstanceEntity instance)
+        {
+            using (var computeClient = new ComputeManagementClient(Credentials))
             {
-                throw ex;
+                var vmdeployment = computeClient.Deployments.GetByName(instance.Name, instance.Design.DesignName + instance.Name);
+                return vmdeployment.Status == DeploymentStatus.Running;
             }
+        }
 
-            throw new NotImplementedException();
+        public bool IsDeployedInstanceOff(InstanceEntity instance)
+        {
+            using (var computeClient = new ComputeManagementClient(Credentials))
+            {
+                var vmdeployment = computeClient.Deployments.GetByName(instance.Name, instance.Design.DesignName + instance.Name);
+                return vmdeployment.Status == DeploymentStatus.Suspended;
+            }
         }
 
         public bool DeleteVM(ProvisionedVmEntity vm)
@@ -186,19 +272,19 @@ namespace EMC.SPaaS.CloudProvider
             throw new NotImplementedException();
         }
 
-        public IEnumerable<IServer> GetAvailableVMOptions()
+        public IEnumerable<Server> GetAvailableVMOptions()
         {
-            List<IServer> serverOptionsList = new List<IServer>(3);
+            List<Server> serverOptionsList = new List<Server>(3);
 
             //Not Real
-            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.ExtraSmall, Processors = "shared core", RAM = "768 MB" });
-            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.Small, Processors = "1 core", RAM = "1.75 GB" });
-            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.Medium, Processors = "2 cores", RAM = "3.5 GB" });
-            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.Large, Processors = "4 cores", RAM = "7 GB" });
-            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.ExtraLarge, Processors = "8 cores", RAM = "14 GB" });
-            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.A5, Processors = "2 cores", RAM = "14 GB" });
-            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.A6, Processors = "4 cores", RAM = "28 GB" });
-            serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.A7, Processors = "8 cores", RAM = "56 GB" });
+            serverOptionsList.Add(new Server(Name: VirtualMachineRoleSize.ExtraSmall, Processors: "shared core", RAM: "768 MB"));
+            serverOptionsList.Add(new Server(Name: VirtualMachineRoleSize.Small, Processors: "1 core", RAM: "1.75 GB"));
+            serverOptionsList.Add(new Server(Name: VirtualMachineRoleSize.Medium, Processors: "2 cores", RAM: "3.5 GB"));
+            serverOptionsList.Add(new Server(Name: VirtualMachineRoleSize.Large, Processors: "4 cores", RAM: "7 GB"));
+            serverOptionsList.Add(new Server(Name: VirtualMachineRoleSize.ExtraLarge, Processors: "8 cores", RAM: "14 GB"));
+            serverOptionsList.Add(new Server(Name: VirtualMachineRoleSize.A5, Processors: "2 cores", RAM: "14 GB"));
+            serverOptionsList.Add(new Server(Name: VirtualMachineRoleSize.A6, Processors: "4 cores", RAM: "28 GB"));
+            serverOptionsList.Add(new Server(Name: VirtualMachineRoleSize.A7, Processors: "8 cores", RAM: "56 GB"));
             //serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.A8, Processors = 2, RAM = 3 });
             //serverOptionsList.Add(new AzureServer() { Name = VirtualMachineRoleSize.A9, Processors = 2, RAM = 3 });
 
@@ -222,22 +308,25 @@ namespace EMC.SPaaS.CloudProvider
             }
         }
 
-        class AzureServer : IServer
+        public IEnumerable<ProvisionedVmEntity> GetVMDetails(InstanceEntity instance)
         {
-            public string Name
+            List<ProvisionedVmEntity> VMs = new List<ProvisionedVmEntity>();
+            using (var computeClient = new ComputeManagementClient(Credentials))
             {
-                get; set;
+                foreach(var vmDesign in instance.Design.VMs)
+                {
+                    var vmInfo = computeClient.VirtualMachines.Get(instance.Name, instance.Design.DesignName + instance.Name, vmDesign.Name);
+
+                    VMs.Add(new ProvisionedVmEntity {
+                        IP = vmInfo.ConfigurationSets[0].PublicIPs[0].Name,
+                        Name = vmDesign.Name,
+                        StatusId = (int)ProvisionedVmStatus.TurnedOn,
+                        VmId = vmInfo.ConfigurationSets[0].HostName
+                    });
+                }
             }
 
-            public string Processors
-            {
-                get; set;
-            }
-
-            public string RAM
-            {
-                get; set;
-            }
+            return VMs;
         }
     }
 }

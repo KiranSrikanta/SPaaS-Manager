@@ -145,5 +145,13 @@ namespace EMC.SPaaS.Repository
             vm.InstanceId = instance.Id;
             Context.VMs.Add(vm);
         }
+
+        public void AddVM(InstanceEntity instance, IEnumerable<ProvisionedVmEntity> vmCollection)
+        {
+            foreach(var vm in vmCollection)
+            {
+                AddVM(instance, vm);
+            }
+        }
     }
 }

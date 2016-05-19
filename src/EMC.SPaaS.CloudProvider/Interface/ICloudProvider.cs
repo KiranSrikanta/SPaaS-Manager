@@ -11,12 +11,18 @@ namespace EMC.SPaaS.CloudProvider
     {
         void Initialize(InstanceEntity instance);
 
-        ProvisionedVmEntity CreateVM(VMDesignEntity vmDesign, InstanceEntity instance);
+        void CreateVM(InstanceEntity instance);
 
         bool DeleteVM(ProvisionedVmEntity vm);
 
         bool TurnOnVM(ProvisionedVmEntity vm);
 
         bool TurnOffVM(ProvisionedVmEntity vm);
+
+        bool IsDeployedInstanceRunning(InstanceEntity instance);
+
+        bool IsDeployedInstanceOff(InstanceEntity instance);
+
+        IEnumerable<ProvisionedVmEntity> GetVMDetails(InstanceEntity instance);
     }
 }

@@ -144,6 +144,21 @@ namespace EMC.SPaaS.Manager
                             Id = (int)InstanceStatus.TurnedOff,
                             Status = "Turned Off"
                         });
+                        context.InstanceStatuses.Add(new InstanceStatusEntity
+                        {
+                            Id = (int)InstanceStatus.Provisioning,
+                            Status = "Provisioning"
+                        });
+                        context.InstanceStatuses.Add(new InstanceStatusEntity
+                        {
+                            Id = (int)InstanceStatus.ChefNodeInstallation,
+                            Status = "Chef Node Installation"
+                        });
+                        context.InstanceStatuses.Add(new InstanceStatusEntity
+                        {
+                            Id = (int)InstanceStatus.SolutionInstallation,
+                            Status = "Solution Installation"
+                        });
 
                         context.SaveChanges();
                     }
