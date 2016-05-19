@@ -16,22 +16,28 @@ namespace EMC.SPaaS.Repository
         public void Add(VMDesignEntity entity)
         {
             _context.VMDesigns.Add(entity);
-            _context.SaveChanges();
+            
         }
 
         public VMDesignEntity Find(int id)
         {
-            throw new NotImplementedException();
+            
+            return _context.VMDesigns.FirstOrDefault(s=> s.DId == id);
         }
 
         public IEnumerable<VMDesignEntity> GetAll(int userID)
         {
-            throw new NotImplementedException();
+            
+            return _context.VMDesigns.Where(vm => vm.UserId == userID);
         }
 
-        public void Remove(int entity)
+        public void Remove(int designID,int userID)
         {
-            throw new NotImplementedException();
+            var itemRm = _context.VMDesigns.FirstOrDefault(vm => vm.DId == designID && vm.UserId == userID);
+            if(itemRm !=null)
+            {
+                _context.VMDesigns.Remove(itemRm);
+            }
         }
     }
 }

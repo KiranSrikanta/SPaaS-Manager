@@ -59,9 +59,13 @@ namespace EMC.SPaaS.Manager.Controllers
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{id}/{userID}")]
+        public void Delete(int id,int userID)
         {
+            Repositories.Designs.Remove(id, userID);
+            Repositories.VMDesigns.Remove(id, userID);
+            Repositories.Save();
+
         }
     }
 }

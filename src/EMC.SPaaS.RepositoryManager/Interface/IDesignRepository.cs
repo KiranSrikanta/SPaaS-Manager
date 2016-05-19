@@ -10,7 +10,7 @@ namespace EMC.SPaaS.Repository
         IEnumerable<DesignEntity> GetAll(int userID);
         DesignEntity Find(int id);
         void Add(DesignEntity entity);
-        void Remove(int entity);
+        void Remove(int designID,int userID);
 
     }
 }

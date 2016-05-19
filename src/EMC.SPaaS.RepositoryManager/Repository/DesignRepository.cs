@@ -36,10 +36,14 @@ namespace EMC.SPaaS.Repository
                 
         }
 
-        public void Remove(int designID)
+        public void Remove(int designID,int userID)
         {
-           var design = _context.Designs.FirstOrDefault(s => s.DId == designID);
-            _context.Designs.Remove(design);
+           var design = _context.Designs.FirstOrDefault(s => s.DId == designID && s.UserId == userID);
+            if(design !=null)
+            {
+                _context.Designs.Remove(design);
+            }
+            
 
         }
     }
