@@ -20,7 +20,7 @@ namespace EMC.SPaaS.CloudProvider
     public class Azure : ICloudProvider
     {
         //TODO:CONFIG
-        readonly string storageAccountName = "spaasstorage";
+        readonly string storageAccountName;
 
         SubscriptionCloudCredentials Credentials { get; set; }
 
@@ -29,6 +29,8 @@ namespace EMC.SPaaS.CloudProvider
         public Azure(IConfigurationSection configuration, string token)
         {
             OAuthProvider = new AzureAdOAuthProvider(configuration);
+
+            storageAccountName = configuration[GlobalConstants.CloudProviders.Azure.ConfigurationKeys.StorageAccountName];
 
             Credentials = new TokenCloudCredentials(
                 configuration[GlobalConstants.CloudProviders.Azure.ConfigurationKeys.SubscriptionId],
