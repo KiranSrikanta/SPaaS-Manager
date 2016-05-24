@@ -27,24 +27,18 @@ namespace EMC.SPaaS.Repository
 
         public void AddOrUpdate(UserEntity user)
         {
-            if(user.Id == default(int))
+            var dbUser = Context.Users.FirstOrDefault(u => u.UserId == user.UserId);
+
+            if (dbUser == null)
             {
                 Context.Users.Add(user);
             }
             else
             {
-                var dbUser = Context.Users.FirstOrDefault(u => u.Id == user.Id || u.UserId == user.UserId);
-                if(user == null)
-                {
-                    Context.Users.Add(user);
-                }
-                else
-                {
-                    dbUser.AccessToken = user.AccessToken;
-                    dbUser.AuthenticationProvider = user.AuthenticationProvider;
-                    dbUser.UserId = user.UserId;
-                    dbUser.UserName = user.UserName;
-                }
+                dbUser.AccessToken = user.AccessToken;
+                dbUser.AuthenticationProvider = user.AuthenticationProvider;
+                dbUser.UserId = user.UserId;
+                dbUser.UserName = user.UserName;
             }
         }
     }

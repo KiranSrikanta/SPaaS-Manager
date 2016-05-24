@@ -1,4 +1,5 @@
 ﻿using EMC.SPaaS.Entities;
+using Microsoft.Data.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,13 @@ namespace EMC.SPaaS.Repository
 
         public IEnumerable<JobEntity> GetJobByStatus(JobStatus status)
         {
-            return from j in Context.Jobs where j.StatusId == (int)status select j;
+            var jobs = Context.Jobs.Where(j => j.StatusId == (int)status)
+                .Include(j => j.User)
+                .Include(j => j.Instance)
+                .Include(j => j.Instance.Design)
+                .Include(j => j.Instance.VMs)
+                .Include(j => j.Instance.Design.VMs);
+            return jobs;
         }
 
         public void UpdateStatus(JobEntity job, JobStatus status)

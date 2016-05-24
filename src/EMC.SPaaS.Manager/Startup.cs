@@ -191,6 +191,34 @@ namespace EMC.SPaaS.Manager
                         context.SaveChanges();
                     }
                     #endregion
+
+                    #region Provisioned VM Status
+                    if (context.VMsStatuses.Count() == 0)
+                    {
+                        context.VMsStatuses.Add(new ProvisionedVmStatusEntity
+                        {
+                            Id = (int)ProvisionedVmStatus.Busy,
+                            Status = "Busy"
+                        });
+                        context.VMsStatuses.Add(new ProvisionedVmStatusEntity
+                        {
+                            Id = (int)ProvisionedVmStatus.NotProvisioned,
+                            Status = "Not Provisioned"
+                        });
+                        context.VMsStatuses.Add(new ProvisionedVmStatusEntity
+                        {
+                            Id = (int)ProvisionedVmStatus.TurnedOff,
+                            Status = "Turned Off"
+                        });
+                        context.VMsStatuses.Add(new ProvisionedVmStatusEntity
+                        {
+                            Id = (int)ProvisionedVmStatus.TurnedOn,
+                            Status = "Turned On"
+                        });
+
+                        context.SaveChanges();
+                    }
+                    #endregion
                 }
             } 
 

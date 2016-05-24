@@ -30,9 +30,6 @@ namespace EMC.SPaaS.JobScheduler
             {
                 var provisioner = provisionerFactory.CreateProvisioner(job.User, Repositories);
 
-                Repositories.Jobs.UpdateStatus(job, JobStatus.InProgress);
-                Repositories.Save();
-
                 switch ((JobType)job.TypeId)
                 {
                     case JobType.Provision:
@@ -56,6 +53,9 @@ namespace EMC.SPaaS.JobScheduler
                         Repositories.Save();
                         break;
                 }
+
+                Repositories.Jobs.UpdateStatus(job, JobStatus.InProgress);
+                Repositories.Save();
             }
             #endregion
 

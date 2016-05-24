@@ -27,7 +27,7 @@ namespace EMC.SPaaS.Repository
 
         public IEnumerable<InstanceEntity> GetInstancesForUser(int userId)
         {
-            return (from i in Context.Instances where i.Id == userId select i).AsEnumerable();
+            return (from i in Context.Instances where i.UserId == userId select i).AsEnumerable();
         }
 
         public InstanceEntity GetInstance(int instanceId, int userId)

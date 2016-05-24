@@ -6,6 +6,7 @@ using Microsoft.AspNet.Mvc;
 using EMC.SPaaS.Repository;
 using EMC.SPaaS.Entities;
 using Microsoft.AspNet.Authorization;
+using Newtonsoft.Json.Linq;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -65,23 +66,27 @@ namespace EMC.SPaaS.Manager.Controllers
 
         [HttpPost]
         [Authorize]
-        public void Post([FromBody]int designId, [FromBody]string name)
+        public void Post([FromBody]JObject itemDesign)
         {
             var sUserId = User.FindAll(Constants.AuthenticationSession.Properties.UserId).FirstOrDefault().Value;
             int userId = int.Parse(sUserId);
+            int designId = int.Parse(itemDesign["designId"].ToString());
+            string name = itemDesign["name"].ToString();
 
-            var design = Repositories.Designs.Find(designId);
-            var instance = new InstanceEntity();
+            //var design = Repositories.Designs.Find(designId);
 
-            instance.DesignId = designId;
-            instance.Name = name;
-
-            instance.StatusId = 0;
+            var instance = new InstanceEntity {
+                DesignId = designId,
+                Name = name,
+                StatusId = (int)InstanceStatus.NotProvisioned,
+                UserId = userId
+            };
 
             Repositories.Instances.Create(instance);
             Repositories.Save();
 
             Repositories.Instances.Provision(instance, userId);
+            Repositories.Save();
         }
 
         // DELETE api/values/5

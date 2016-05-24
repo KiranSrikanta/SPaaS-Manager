@@ -14,6 +14,8 @@ using Microsoft.WindowsAzure.Management.Storage;
 using Microsoft.WindowsAzure.Management.Storage.Models;
 using Microsoft.WindowsAzure.Management.Models;
 using EMC.SPaaS.Entities;
+using System.Text;
+using System.Data;
 
 namespace EMC.SPaaS.CloudProvider
 {
@@ -87,6 +89,33 @@ namespace EMC.SPaaS.CloudProvider
                 using (var computeClient = new ComputeManagementClient(Credentials))
                 {
                     var operatingSystemImageListResult = computeClient.VirtualMachineOSImages.List().Images;
+
+                    //DataTable table = new DataTable();
+                    //table.Columns.Add("AffinityGroup");
+                    //table.Columns.Add("Category");
+                    //table.Columns.Add("Description");
+                    //table.Columns.Add("Eula");
+                    //table.Columns.Add("ImageFamily");
+                    //table.Columns.Add("IsPremium");
+                    //table.Columns.Add("Label");
+                    //table.Columns.Add("Language");
+                    //table.Columns.Add("Location");
+                    //table.Columns.Add("LogicalSizeInGB");
+                    //table.Columns.Add("MediaLinkUri");
+                    //table.Columns.Add("Name");
+                    //table.Columns.Add("OperatingSystemType");
+                    //table.Columns.Add("PricingDetailUri");
+                    //table.Columns.Add("PrivacyUri");
+                    //table.Columns.Add("PublishedDate");
+                    //table.Columns.Add("PublisherName");
+                    //table.Columns.Add("RecommendedVMSize");
+                    //table.Columns.Add("SmallIconUri");
+
+                    //foreach(var os in operatingSystemImageListResult)
+                    //{
+                    //    table.Rows.Add(os.AffinityGroup, os.Category, os.Description, os.Eula, os.ImageFamily, os.IsPremium, os.Label, os.Language, os.Location,
+                    //    os.LogicalSizeInGB, os.MediaLinkUri, os.Name, os.OperatingSystemType, os.PricingDetailUri, os.PrivacyUri, os.PublishedDate, os.PublisherName, os.RecommendedVMSize, os.SmallIconUri);
+                    //}
 
                     var vmRoles = GetAzureRolesForVmDesignes(instance, operatingSystemImageListResult);
 
@@ -177,7 +206,8 @@ namespace EMC.SPaaS.CloudProvider
 
             foreach (var vmDesign in instance.Design.VMs)
             {
-                var imageName = images.FirstOrDefault(os => os.Label.Contains(vmDesign.Name)).Name;
+                var imageName = (from os in images where os.Label.Contains(vmDesign.OS) orderby os.PublishedDate descending select os).FirstOrDefault();
+                //var imageName = images.FirstOrDefault(os => os.Label.Contains(vmDesign.OS)).Name;
 
                 //OS config
                 var windowsConfigSet = new ConfigurationSet
@@ -215,22 +245,24 @@ namespace EMC.SPaaS.CloudProvider
                 //virtual harddisk
                 var vhd = new OSVirtualHardDisk
                 {
-                    SourceImageName = imageName,
+                    SourceImageName = imageName.Name,
                     HostCaching = VirtualHardDiskHostCaching.ReadWrite,
-                    MediaLink = new Uri(string.Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd", storageAccountName, imageName))
+                    MediaLink = new Uri(string.Format("https://{0}.blob.core.windows.net/vhds/{1}.vhd", storageAccountName, imageName.Name))
                 };
 
                 //vm configuration
                 var vmAttributes = new Role
                 {
                     RoleName = vmDesign.Name,
-
+                    
                     //Make configurable
                     RoleSize = vmDesign.Type,//VirtualMachineRoleSize.Small,
                     RoleType = VirtualMachineRoleType.PersistentVMRole.ToString(),
                     OSVirtualHardDisk = vhd,
+                    
+                    //VMImageName = imageName.Name,
                     ConfigurationSets = new List<ConfigurationSet> { windowsConfigSet, networkConfigSet },
-
+                    
                     //Optional?
                     ProvisionGuestAgent = true
                 };
@@ -301,12 +333,21 @@ namespace EMC.SPaaS.CloudProvider
             //create cloud service
             using (var computeClient = new ComputeManagementClient(Credentials))
             {
-                computeClient.HostedServices.Create(new HostedServiceCreateParameters
+                try
                 {
-                    Label = hostedServiceLabel,
-                    Location = LocationNames.WestUS,
-                    ServiceName = hostedService
-                });
+                    var result = computeClient.HostedServices.Create(new HostedServiceCreateParameters
+                    {
+                        Label = hostedServiceLabel,
+                        Location = LocationNames.EastAsia,
+                        ServiceName = hostedService
+                    });
+
+                    var id = result.RequestId;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
             }
         }
 
@@ -315,11 +356,12 @@ namespace EMC.SPaaS.CloudProvider
             List<ProvisionedVmEntity> VMs = new List<ProvisionedVmEntity>();
             using (var computeClient = new ComputeManagementClient(Credentials))
             {
-                foreach(var vmDesign in instance.Design.VMs)
+                foreach (var vmDesign in instance.Design.VMs)
                 {
                     var vmInfo = computeClient.VirtualMachines.Get(instance.Name, instance.Design.DesignName + instance.Name, vmDesign.Name);
 
-                    VMs.Add(new ProvisionedVmEntity {
+                    VMs.Add(new ProvisionedVmEntity
+                    {
                         IP = vmInfo.ConfigurationSets[0].PublicIPs[0].Name,
                         Name = vmDesign.Name,
                         StatusId = (int)ProvisionedVmStatus.TurnedOn,
