@@ -8,6 +8,7 @@ using EMC.SPaaS.ProvisioningEngine;
 using Microsoft.Extensions.Configuration;
 using System.Threading;
 using System.Linq;
+using EMC.SPaaS.ScriptRunner;
 
 namespace EMC.SPaaS.JobScheduler
 {
@@ -87,9 +88,17 @@ namespace EMC.SPaaS.JobScheduler
                                     {
                                         vm.StatusId = (int)ProvisionedVmStatus.TurnedOn;
                                     }
-                                    //provisioner.UpdateProvisionedVMDetails(job.Instance);
-                                    //Repositories.Instances.AddVM(job.Instance, VMs);
                                     Repositories.Save();
+
+                                    var vmsWithDesign = from vm in job.Instance.VMs
+                                                       join vmd in job.Instance.Design.VMs on vm.Name equals vmd.Name
+                                                       select new { IP = vm.IP, UserName = vmd.UserName, Password = vmd.Password };
+
+                                    foreach(var vmWithDesign in vmsWithDesign)
+                                    {
+                                        PowerShell.RunScriptRemotely(vmWithDesign.UserName, vmWithDesign.Password, vmWithDesign.IP, "winrm quickconfig");
+                                    }
+
                                     //TODO:INSTALL CHEF NODE
                                     job.Instance.StatusId = (int)InstanceStatus.ChefNodeInstallation;
                                     Repositories.Save();

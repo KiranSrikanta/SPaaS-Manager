@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0-*",
+  "description": "EMC.SPaaS.ScriptRunner Class Library",
+  "authors": [ "srikak" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "net451": { }
+  },
+  "dependencies": {
+    "System.Management.Automation": "6.1.7601.17515"
+  }
+}
