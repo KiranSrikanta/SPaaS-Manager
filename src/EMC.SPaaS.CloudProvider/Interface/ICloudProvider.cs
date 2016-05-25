@@ -19,10 +19,8 @@ namespace EMC.SPaaS.CloudProvider
 
         bool TurnOffVM(ProvisionedVmEntity vm);
 
-        bool IsDeployedInstanceRunning(InstanceEntity instance);
+        bool UpdateVMDetailsIfInstanceRunning(InstanceEntity instance);
 
         bool IsDeployedInstanceOff(InstanceEntity instance);
-
-        IEnumerable<ProvisionedVmEntity> GetVMDetails(InstanceEntity instance);
     }
 }

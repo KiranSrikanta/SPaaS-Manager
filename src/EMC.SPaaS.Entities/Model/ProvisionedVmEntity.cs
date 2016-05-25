@@ -42,7 +42,7 @@ namespace EMC.SPaaS.Entities
 
     public enum ProvisionedVmStatus
     {
-        NotProvisioned,
+        NotProvisioned = 1,
         TurnedOn,
         TurnedOff,
         Busy

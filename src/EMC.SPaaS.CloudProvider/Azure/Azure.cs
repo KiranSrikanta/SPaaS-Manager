@@ -254,15 +254,15 @@ namespace EMC.SPaaS.CloudProvider
                 var vmAttributes = new Role
                 {
                     RoleName = vmDesign.Name,
-                    
+
                     //Make configurable
                     RoleSize = vmDesign.Type,//VirtualMachineRoleSize.Small,
                     RoleType = VirtualMachineRoleType.PersistentVMRole.ToString(),
                     OSVirtualHardDisk = vhd,
-                    
+
                     //VMImageName = imageName.Name,
                     ConfigurationSets = new List<ConfigurationSet> { windowsConfigSet, networkConfigSet },
-                    
+
                     //Optional?
                     ProvisionGuestAgent = true
                 };
@@ -273,12 +273,32 @@ namespace EMC.SPaaS.CloudProvider
             return roles;
         }
 
-        public bool IsDeployedInstanceRunning(InstanceEntity instance)
+        public bool UpdateVMDetailsIfInstanceRunning(InstanceEntity instance)
         {
             using (var computeClient = new ComputeManagementClient(Credentials))
             {
                 var vmdeployment = computeClient.Deployments.GetByName(instance.Name, instance.Design.DesignName + instance.Name);
-                return vmdeployment.Status == DeploymentStatus.Running;
+                var operationStatus = computeClient.GetOperationStatus(vmdeployment.RequestId).Status;
+
+                if (operationStatus == OperationStatus.Failed)
+                    throw new Exception("Unknown error...");
+
+                if (operationStatus == OperationStatus.Succeeded)
+                {
+                    var zippedVmIp = instance.VMs.Zip(vmdeployment.VirtualIPAddresses, (vm, ip) =>
+                    {
+                        return new { VM = vm, IP = ip.Address };
+                    });
+
+                    foreach(var vmIp in zippedVmIp)
+                    {
+                        vmIp.VM.IP = vmIp.IP;
+                    }
+
+                    return true;
+                }
+
+                return false;
             }
         }
 
@@ -349,28 +369,6 @@ namespace EMC.SPaaS.CloudProvider
                     throw ex;
                 }
             }
-        }
-
-        public IEnumerable<ProvisionedVmEntity> GetVMDetails(InstanceEntity instance)
-        {
-            List<ProvisionedVmEntity> VMs = new List<ProvisionedVmEntity>();
-            using (var computeClient = new ComputeManagementClient(Credentials))
-            {
-                foreach (var vmDesign in instance.Design.VMs)
-                {
-                    var vmInfo = computeClient.VirtualMachines.Get(instance.Name, instance.Design.DesignName + instance.Name, vmDesign.Name);
-
-                    VMs.Add(new ProvisionedVmEntity
-                    {
-                        IP = vmInfo.ConfigurationSets[0].PublicIPs[0].Name,
-                        Name = vmDesign.Name,
-                        StatusId = (int)ProvisionedVmStatus.TurnedOn,
-                        VmId = vmInfo.ConfigurationSets[0].HostName
-                    });
-                }
-            }
-
-            return VMs;
         }
     }
 }

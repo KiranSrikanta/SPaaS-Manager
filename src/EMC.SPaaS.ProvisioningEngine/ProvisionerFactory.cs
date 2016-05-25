@@ -17,14 +17,14 @@ namespace EMC.SPaaS.ProvisioningEngine
         {
             AuthenticationConfiguration = authConfiguration;
         }
-        public IProvisioner CreateProvisioner(UserEntity User, RepositoryManager repositories)
+        public IProvisioner CreateProvisioner(UserEntity User)
         {
             //TODO: IMPLEMENT STRATAGY PATTERN
             if (User.AuthenticationProvider == GlobalConstants.CloudProviders.Azure.Name)
             {
                 var azureCloudProvider = new Azure(AuthenticationConfiguration.GetSection(GlobalConstants.CloudProviders.Azure.Name), User.AccessToken);
 
-                return new Provisioner(azureCloudProvider, repositories);
+                return new Provisioner(azureCloudProvider);
             }
             else
                 return null;

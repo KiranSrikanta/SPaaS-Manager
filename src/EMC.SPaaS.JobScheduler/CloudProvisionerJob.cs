@@ -7,6 +7,7 @@ using Microsoft.Data.Entity;
 using EMC.SPaaS.ProvisioningEngine;
 using Microsoft.Extensions.Configuration;
 using System.Threading;
+using System.Linq;
 
 namespace EMC.SPaaS.JobScheduler
 {
@@ -24,18 +25,26 @@ namespace EMC.SPaaS.JobScheduler
             var provisionerFactory = new ProvisionerFactory(rootConfig.GetSection("Authentication"));
 
             #region New Jobs
-            var newJobs = Repositories.Jobs.GetJobByStatus(JobStatus.NotStarted);
+            var newJobs = Repositories.Jobs.GetJobByStatus(JobStatus.NotStarted).Cast<JobEntity>().ToArray();
 
             foreach (var job in newJobs)
             {
-                var provisioner = provisionerFactory.CreateProvisioner(job.User, Repositories);
+                var provisioner = provisionerFactory.CreateProvisioner(job.User);
 
                 switch ((JobType)job.TypeId)
                 {
                     case JobType.Provision:
                         provisioner.CreateInstanceVMs(job.Instance);
-                        job.Instance.StatusId = (int)InstanceStatus.Provisioning;
-                        Repositories.Save();
+                        foreach (var vm in job.Instance.Design.VMs)
+                        {
+                            Repositories.Instances.AddVM(job.Instance, new ProvisionedVmEntity
+                            {
+                                Name = vm.Name,
+                                StatusId = (int)ProvisionedVmStatus.Busy
+                            });
+
+                            job.Instance.StatusId = (int)InstanceStatus.Provisioning;
+                        }
                         break;
                     case JobType.Release:
                         provisioner.DeleteInstanceVMs(job.InstanceId);
@@ -60,7 +69,7 @@ namespace EMC.SPaaS.JobScheduler
             #endregion
 
             #region In Progress
-            var jobsInProgress = Repositories.Jobs.GetJobByStatus(JobStatus.InProgress);
+            var jobsInProgress = Repositories.Jobs.GetJobByStatus(JobStatus.InProgress).Cast<JobEntity>().ToArray();
             foreach (var job in jobsInProgress)
             {
                 try
@@ -71,11 +80,15 @@ namespace EMC.SPaaS.JobScheduler
                         switch ((InstanceStatus)job.Instance.StatusId)
                         {
                             case InstanceStatus.Provisioning:
-                                var provisioner = provisionerFactory.CreateProvisioner(job.User, Repositories);
-                                if (provisioner.IsInstanceRunning(job.Instance))
+                                var provisioner = provisionerFactory.CreateProvisioner(job.User);
+                                if (provisioner.UpdateDetailsIfInstanceRunning(job.Instance))
                                 {
-                                    IEnumerable<ProvisionedVmEntity> VMs = provisioner.GetProvisionedVMDetails(job.Instance);
-                                    Repositories.Instances.AddVM(job.Instance, VMs);
+                                    foreach (var vm in job.Instance.VMs)
+                                    {
+                                        vm.StatusId = (int)ProvisionedVmStatus.TurnedOn;
+                                    }
+                                    //provisioner.UpdateProvisionedVMDetails(job.Instance);
+                                    //Repositories.Instances.AddVM(job.Instance, VMs);
                                     Repositories.Save();
                                     //TODO:INSTALL CHEF NODE
                                     job.Instance.StatusId = (int)InstanceStatus.ChefNodeInstallation;
@@ -107,8 +120,8 @@ namespace EMC.SPaaS.JobScheduler
                     #region TurnOn
                     if (job.TypeId == (int)JobType.TurnOn)
                     {
-                        var provisioner = provisionerFactory.CreateProvisioner(job.User, Repositories);
-                        if (provisioner.IsInstanceRunning(job.Instance))
+                        var provisioner = provisionerFactory.CreateProvisioner(job.User);
+                        if (provisioner.UpdateDetailsIfInstanceRunning(job.Instance))
                         {
                             job.Instance.StatusId = (int)InstanceStatus.TurnedOn;
                             job.StatusId = (int)JobStatus.Successful;
@@ -120,7 +133,7 @@ namespace EMC.SPaaS.JobScheduler
                     #region TurnOff
                     if (job.TypeId == (int)JobType.TurnOff)
                     {
-                        var provisioner = provisionerFactory.CreateProvisioner(job.User, Repositories);
+                        var provisioner = provisionerFactory.CreateProvisioner(job.User);
                         if (provisioner.IsInstanceOff(job.Instance))
                         {
                             job.Instance.StatusId = (int)InstanceStatus.TurnedOff;
@@ -133,7 +146,7 @@ namespace EMC.SPaaS.JobScheduler
                 catch (Exception ex)
                 {
                     job.ErrorDetails = string.Format("Error: {0}" + Environment.NewLine + "Stack Trace: {1}", ex.Message, ex.StackTrace);
-                    job.StatusId = (int)JobStatus.Failed;
+                    //job.StatusId = (int)JobStatus.Failed;
                     Repositories.Save();
                 }
             }
