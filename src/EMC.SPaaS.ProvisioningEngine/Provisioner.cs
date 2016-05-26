@@ -12,26 +12,16 @@ namespace EMC.SPaaS.ProvisioningEngine
     public class Provisioner : IProvisioner
     {
         ICloudProvider _cloudProvider;
-        RepositoryManager _repositories;
 
-        public Provisioner(ICloudProvider CloudProvider, RepositoryManager repositories)
+        public Provisioner(ICloudProvider CloudProvider)
         {
             _cloudProvider = CloudProvider;
-            _repositories = repositories;
         }
 
         public void CreateInstanceVMs(InstanceEntity instance)
         {
             _cloudProvider.Initialize(instance);
             _cloudProvider.CreateVM(instance);
-            foreach (var vm in instance.Design.VMs)
-            {
-                _repositories.Instances.AddVM(instance, new ProvisionedVmEntity {
-                    Name = vm.Name,
-                    StatusId = (int)ProvisionedVmStatus.Busy
-                });
-            }
-            _repositories.Save();
         }
 
         public bool TurnOnInstanceVMs(int instanceId)
@@ -57,9 +47,9 @@ namespace EMC.SPaaS.ProvisioningEngine
             CreateInstanceVMs(instance);
         }
 
-        public bool IsInstanceRunning(InstanceEntity instance)
+        public bool UpdateDetailsIfInstanceRunning(InstanceEntity instance)
         {
-            return _cloudProvider.IsDeployedInstanceRunning(instance);
+            return _cloudProvider.UpdateVMDetailsIfInstanceRunning(instance);
         }
 
         public bool IsInstanceOff(InstanceEntity instance)
@@ -67,9 +57,9 @@ namespace EMC.SPaaS.ProvisioningEngine
             return _cloudProvider.IsDeployedInstanceOff(instance);
         }
 
-        public IEnumerable<ProvisionedVmEntity> GetProvisionedVMDetails(InstanceEntity instance)
+        public void UpdateProvisionedVMDetails(InstanceEntity instance)
         {
-            return _cloudProvider.GetVMDetails(instance);
+            _cloudProvider.UpdateVMDetailsIfInstanceRunning(instance);
         }
     }
 }

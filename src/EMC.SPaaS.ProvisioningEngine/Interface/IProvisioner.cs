@@ -16,10 +16,8 @@ namespace EMC.SPaaS.ProvisioningEngine
 
         bool DeleteInstanceVMs(int instanceId);
 
-        bool IsInstanceRunning(InstanceEntity instance);
+        bool UpdateDetailsIfInstanceRunning(InstanceEntity instance);
 
         bool IsInstanceOff(InstanceEntity instance);
-
-        IEnumerable<ProvisionedVmEntity> GetProvisionedVMDetails(InstanceEntity instance);
     }
 }
