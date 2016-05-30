@@ -16,6 +16,8 @@ using Microsoft.WindowsAzure.Management.Models;
 using EMC.SPaaS.Entities;
 using System.Text;
 using System.Data;
+using System.Dynamic;
+using Newtonsoft.Json;
 
 namespace EMC.SPaaS.CloudProvider
 {
@@ -220,6 +222,9 @@ namespace EMC.SPaaS.CloudProvider
                 };
 
                 //remote powershell and rdp
+                var remoteSettings = new WindowsRemoteManagementSettings();
+                var httpListner = new WindowsRemoteManagementListener(VirtualMachineWindowsRemoteManagementListenerType.Http);
+                remoteSettings.Listeners.Add(httpListner);
                 var networkConfigSet = new ConfigurationSet
                 {
                     ConfigurationSetType = "NetworkConfiguration",
@@ -228,9 +233,9 @@ namespace EMC.SPaaS.CloudProvider
                             new InputEndpoint
                             {
                               Name = "PowerShell",
-                              LocalPort = 5986,
+                              LocalPort = 5985,
                               Protocol = "tcp",
-                              Port = 5986,
+                              Port = 5985,
                             },
                             new InputEndpoint
                             {
@@ -239,7 +244,8 @@ namespace EMC.SPaaS.CloudProvider
                               Protocol = "tcp",
                               Port = 3389,
                             }
-                          }
+                          },
+                    WindowsRemoteManagement = remoteSettings
                 };
 
                 //virtual harddisk
