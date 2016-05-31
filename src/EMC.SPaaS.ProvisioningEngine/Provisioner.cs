@@ -61,5 +61,15 @@ namespace EMC.SPaaS.ProvisioningEngine
         {
             _cloudProvider.UpdateVMDetailsIfInstanceRunning(instance);
         }
+
+        public IEnumerable<Server> VMOptions()
+        {
+            return _cloudProvider.VMOptions();
+        }
+
+        public IEnumerable<string> OSImageOptions()
+        {
+            return _cloudProvider.OSImageOptions();
+        }
     }
 }

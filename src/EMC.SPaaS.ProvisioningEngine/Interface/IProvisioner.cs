@@ -19,5 +19,9 @@ namespace EMC.SPaaS.ProvisioningEngine
         bool UpdateDetailsIfInstanceRunning(InstanceEntity instance);
 
         bool IsInstanceOff(InstanceEntity instance);
+
+        IEnumerable<Server> VMOptions();
+
+        IEnumerable<string> OSImageOptions();
     }
 }

@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0-*",
+  "description": "EMC.SPaaS.ChefAPI Class Library",
+  "authors": [ "srikak" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "net451": { }
+  },
+  "dependencies": {
+    "mixlib-authentication": "1.0.0"
+  }
+}

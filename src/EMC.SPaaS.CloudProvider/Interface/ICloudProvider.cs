@@ -22,5 +22,9 @@ namespace EMC.SPaaS.CloudProvider
         bool UpdateVMDetailsIfInstanceRunning(InstanceEntity instance);
 
         bool IsDeployedInstanceOff(InstanceEntity instance);
+
+        IEnumerable<Server> VMOptions();
+
+        IEnumerable<string> OSImageOptions();
     }
 }

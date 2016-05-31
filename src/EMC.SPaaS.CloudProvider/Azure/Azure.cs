@@ -296,7 +296,7 @@ namespace EMC.SPaaS.CloudProvider
                         return new { VM = vm, IP = ip.Address };
                     });
 
-                    foreach(var vmIp in zippedVmIp)
+                    foreach (var vmIp in zippedVmIp)
                     {
                         vmIp.VM.IP = vmIp.IP;
                     }
@@ -376,5 +376,20 @@ namespace EMC.SPaaS.CloudProvider
                 }
             }
         }
+
+        public IEnumerable<Server> VMOptions()
+        {
+            return GetAvailableVMOptions();
+        }
+
+        public IEnumerable<string> OSImageOptions()
+        {
+            using (var computeClient = new ComputeManagementClient(Credentials))
+            {
+                var operatingSystemImageListResult = computeClient.VirtualMachineOSImages.List().Images;
+                return (from os in operatingSystemImageListResult select os.Label).AsEnumerable();
+            }
+        }
     }
 }
+
