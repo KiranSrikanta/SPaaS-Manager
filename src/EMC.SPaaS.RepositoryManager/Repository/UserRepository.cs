@@ -39,6 +39,8 @@ namespace EMC.SPaaS.Repository
                 dbUser.AuthenticationProvider = user.AuthenticationProvider;
                 dbUser.UserId = user.UserId;
                 dbUser.UserName = user.UserName;
+
+                user.Id = dbUser.Id;
             }
         }
     }
