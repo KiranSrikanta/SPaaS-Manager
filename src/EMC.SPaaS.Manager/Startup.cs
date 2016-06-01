@@ -219,6 +219,18 @@ namespace EMC.SPaaS.Manager
                         context.SaveChanges();
                     }
                     #endregion
+
+                    #region SolutionEnvironments
+                    if(context.SolnEnvironments.Count()==0)
+                    {
+                        context.SolnEnvironments.Add(new SolnEnvironmentEntity
+                        {
+                            Name = "SP",
+                            Versions = "2016,2013,2010"
+                        });
+                        context.SaveChanges();
+                    }
+                    #endregion
                 }
             } 
 

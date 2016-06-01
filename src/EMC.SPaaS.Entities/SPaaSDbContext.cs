@@ -40,5 +40,6 @@ namespace EMC.SPaaS.Entities
         public DbSet<JobEntity> Jobs { get; set; }
         public DbSet<JobTypeEntity> JobTypes { get; set; }
         public DbSet<JobStatusEntity> JobStatuses { get; set; }
+        public DbSet<SolnEnvironmentEntity> SolnEnvironments { get; set; }
     }
 }
