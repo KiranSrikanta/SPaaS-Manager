@@ -225,6 +225,7 @@ namespace EMC.SPaaS.Manager
                     {
                         context.SolnEnvironments.Add(new SolnEnvironmentEntity
                         {
+                            EnvID=1,
                             Name = "SP",
                             Versions = "2016,2013,2010"
                         });

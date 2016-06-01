@@ -11,23 +11,24 @@ using Newtonsoft.Json;
 
 namespace EMC.SPaaS.Manager.Controllers
 {
-    [Route("api/[controller]")]
-    public class SharepointDesignController : Controller
+    
+    public class DesignController : Controller
     {
         private RepositoryManager Repositories { get; set; }
 
-        public SharepointDesignController(SPaaSDbContext dbContext)
+        public DesignController(SPaaSDbContext dbContext)
         {
             Repositories = new RepositoryManager(dbContext);
         }
-        // GET: api/values
+        
+        [Route("api/[controller]/Sharepoint")]
         [HttpGet]
         public IEnumerable<DesignEntity> GetAll()
         {
 
             return Repositories.Designs.GetAll(1);
         }
-
+        [Route("api/[controller]/Sharepoint")]
         // GET api/values/5
         [HttpGet("{id}")]
         public DesignEntity Get(int id)
@@ -36,6 +37,7 @@ namespace EMC.SPaaS.Manager.Controllers
         }
 
         // POST api/values
+        [Route("api/[controller]/Sharepoint")]
         [HttpPost]
         public void Post([FromBody] JObject itemDesign)
         {
@@ -53,12 +55,14 @@ namespace EMC.SPaaS.Manager.Controllers
         }
 
         // PUT api/values/5
+        [Route("api/[controller]/Sharepoint")]
         [HttpPut("{id}")]
         public void Put(int id, [FromBody]string value)
         {
         }
 
         // DELETE api/values/5
+        [Route("api/[controller]/Sharepoint")]
         [HttpDelete("{id}/{userID}")]
         public void Delete(int id,int userID)
         {
