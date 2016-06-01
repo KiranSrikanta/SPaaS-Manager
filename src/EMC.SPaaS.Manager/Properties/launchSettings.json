@@ -11,7 +11,8 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/sharepointdesign",
+      //"launchUrl": "api/sharepointdesign",
+      "launchUrl": "",
       "environmentVariables": {
         "Hosting:Environment": "Development"
       }
