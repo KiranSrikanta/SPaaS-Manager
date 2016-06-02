@@ -7,13 +7,15 @@ using EMC.SPaaS.Entities;
 using EMC.SPaaS.Repository;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using EMC.SPaaS.Utility;
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace EMC.SPaaS.Manager.Controllers
 {
-    
+   
     public class DesignController : Controller
     {
+        XMLUtility objXmlUitility = new XMLUtility();
         private RepositoryManager Repositories { get; set; }
 
         public DesignController(SPaaSDbContext dbContext)
@@ -46,6 +48,11 @@ namespace EMC.SPaaS.Manager.Controllers
                 dynamic jsonData = itemDesign;
                 var objDesign = jsonData.Designs["compDesign"][0].ToObject<DesignEntity>();
                 var objVMDesign = jsonData.Designs["compVMDesign"][0].ToObject<VMDesignEntity>();
+                var objXMLDesign = jsonData.Designs["XMLDesignData"][0].ToObject<XMLDesignData>();
+                //Create XMLDocument
+                string xmlData = PrepareXMLData(objXMLDesign); ;
+                objDesign.DesignXML = xmlData;
+                objVMDesign.DesignXML = xmlData;
 
                 Repositories.Designs.Add(objDesign);
                 Repositories.VMDesigns.Add(objVMDesign);
@@ -70,6 +77,29 @@ namespace EMC.SPaaS.Manager.Controllers
             Repositories.VMDesigns.Remove(id, userID);
             Repositories.Save();
 
+        }
+
+        public string PrepareXMLData(XMLDesignData xmlData)
+        {
+            string retString;
+            Configuration objConfigXML = new Configuration();
+            ConfigurationInstall objConfigInstall = new ConfigurationInstall();
+            ConfigurationFarm objConfigFarm = new ConfigurationFarm();
+            ConfigurationFarmDatabase objConfigFarmDB = new ConfigurationFarmDatabase();
+            ConfigurationFarmAccount objConfigFarmAccount = new ConfigurationFarmAccount();
+            objConfigFarmDB.DBServer = xmlData.FarmDBServerName;
+            objConfigInstall.SPVersion = Convert.ToUInt16(xmlData.SPVersion);
+            objConfigFarm.Passphrase = xmlData.PassPhrase;
+            objConfigFarmAccount.Username = xmlData.FarmAccountUsername;
+            objConfigFarmAccount.Password = xmlData.FarmAccountPassword;
+
+            objConfigFarm.Account = objConfigFarmAccount;
+            objConfigFarm.Database = objConfigFarmDB;
+            objConfigXML.Install = objConfigInstall;
+            objConfigXML.Farm = objConfigFarm;
+
+            retString = objXmlUitility.CreateDocument(objConfigXML);
+            return retString;
         }
     }
 }
