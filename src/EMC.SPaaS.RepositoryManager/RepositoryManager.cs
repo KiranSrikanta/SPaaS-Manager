@@ -50,7 +50,13 @@ namespace EMC.SPaaS.Repository
                 return new VMDesignRepository(Context);
             }
         }
-
+        public ISolnEnvRepository SolnEnvironments
+        {
+            get
+            {
+                return new SolnEnvRepository(Context);
+            }
+        }
         public void Save()
         {
             Context.SaveChanges();
