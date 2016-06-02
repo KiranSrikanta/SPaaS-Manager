@@ -8,6 +8,7 @@ using EMC.SPaaS.Repository;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using EMC.SPaaS.Utility;
+using Microsoft.AspNet.Authorization;
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace EMC.SPaaS.Manager.Controllers
@@ -41,6 +42,7 @@ namespace EMC.SPaaS.Manager.Controllers
         // POST api/values
         [Route("api/[controller]/Sharepoint")]
         [HttpPost]
+        [Authorize]
         public void Post([FromBody] JObject itemDesign)
         {
             if(itemDesign != null)
@@ -48,7 +50,7 @@ namespace EMC.SPaaS.Manager.Controllers
                 dynamic jsonData = itemDesign;
                 var objDesign = jsonData.Designs["compDesign"][0].ToObject<DesignEntity>();
                 var objVMDesign = jsonData.Designs["compVMDesign"][0].ToObject<VMDesignEntity>();
-                var objXMLDesign = jsonData.Designs["XMLDesignData"][0].ToObject<XMLDesignData>();
+                var objXMLDesign = jsonData.Designs["xmlDesignData"][0].ToObject<XMLDesignData>();
                 //Create XMLDocument
                 string xmlData = PrepareXMLData(objXMLDesign); ;
                 objDesign.DesignXML = xmlData;
