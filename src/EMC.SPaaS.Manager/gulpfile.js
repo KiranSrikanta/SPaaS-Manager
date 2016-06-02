@@ -18,7 +18,7 @@ var paths = {
     minCss: webroot + "css/**/*.min.css",
     concatcontrollersJsDest: webroot + "js/controllers/controllers.min.js",
     concatappJsDest: webroot + "js/app.min.js",
-    concatCssDest: webroot + "css/site.min.css"
+    concatCssDest: webroot + "css/style.min.css"
 };
 
 gulp.task("clean:controllersjs", function (cb) {

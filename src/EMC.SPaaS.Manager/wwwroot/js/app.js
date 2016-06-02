@@ -8,6 +8,10 @@
                 templateUrl: 'templates/home.html',
                 controller: 'homeController'
             })
+            .when('/BuildEnvironment', {
+                templateUrl: 'templates/build.html',
+                controller: 'buildController'
+            })
         .when('/Login', {
             templateUrl: 'templates/login.html',
             controller: 'authController'
