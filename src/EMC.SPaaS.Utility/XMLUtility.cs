@@ -12,13 +12,14 @@ namespace EMC.SPaaS.Utility
     {
      public  String CreateDocument(Configuration xmlConfigTemplate)
         {
-            XmlDocument tempDoc=null;
+            XmlDocument tempDoc=new XmlDocument();
             Configuration xmlConfig = new Configuration();
             XmlSerializer xSer = new XmlSerializer(typeof(Configuration));
             xmlConfig = xmlConfigTemplate;
             using (MemoryStream xmlMstream = new MemoryStream())
             {
                 xSer.Serialize(xmlMstream, xmlConfig);
+                xmlMstream.Position = 0;
                 tempDoc.Load(xmlMstream);
 
             }
