@@ -42,7 +42,7 @@ namespace EMC.SPaaS.Manager.Controllers
         // POST api/values
         [Route("api/[controller]/Sharepoint")]
         [HttpPost]
-        
+        [Authorize]
         public void Post([FromBody] JObject itemDesign)
         {
             if(itemDesign != null)
