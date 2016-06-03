@@ -1,9 +1,18 @@
 ﻿(function () {
     'use strict';
-    var app = angular.module('SPaaSApp', ['ngRoute']);
+    var app = angular.module('SPaaSApp', ['ngRoute','ngCookies']);
 
-    app.run(['$rootScope', function ($rootScope) {
-        $rootScope.User = null;
+    app.run(['$rootScope', '$http', 'httpGetService', function ($rootScope, $http, httpGetService) {
+        var promise = httpGetService.GETME();
+        promise.then(function (docs) {
+            console.log('Success: ' + docs.data.UserName);
+            $rootScope.User = docs.data.UserName
+        }, function () {
+            $scope.message = {
+                status: messages.danger,
+                details: "Login pending"
+            }
+        });
     }])
 
     var interceptor = ['$q',function ($q) {
@@ -21,7 +30,7 @@
         };
         }]
 
-    app.config(['$routeProvider','$httpProvider',function ($routeProvider,$httpProvider) {
+    app.config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
 
         $httpProvider.interceptors.push(interceptor)
 
