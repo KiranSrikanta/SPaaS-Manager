@@ -1,0 +1,17 @@
+﻿<div  id="statusMessages">
+    <div class="alert alert-success" ng-if="message.status =='success'">
+        <!--<strong>Success!</strong>--> {{message.details}}
+    </div>
+
+    <div class="alert alert-info" ng-if="message.status =='info'">
+        <!--<strong>Info!</strong>--> {{message.details}}
+    </div>
+
+    <div class="alert alert-warning" ng-if="message.status =='warning'">
+        <!--<strong>Warning!</strong>--> {{message.details}}
+    </div>
+
+    <div class="alert alert-danger" ng-if="message.status =='danger'">
+        <!--<strong>Danger!</strong>--> {{message.details}}
+    </div>
+</div>

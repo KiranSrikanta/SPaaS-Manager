@@ -5,6 +5,26 @@
     color: #bbb;
 }
 
+#statusMessages{
+    margin-top: 130px;
+}
+
+.container{
+    margin-top:50px;
+}
+
+#Logout{
+    background-color:#333
+}
+
+#Logout>li>a{
+    color:#fff
+}
+
+#Logout>li:hover {
+    background-color:#ff0000
+}
+
 .navbar img{
     width:20%;
     height:20%
@@ -15,9 +35,9 @@
     font-weight:bold;
 }
 
-.ng-scope{
+/*.ng-scope{
     padding-top:80px;
-}
+}*/
 
 .signin-card{
         background-color: #f7f7f7;

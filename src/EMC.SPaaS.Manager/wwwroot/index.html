@@ -31,7 +31,14 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="#/Home">Home</a></li>
                         <li><a href="#/BuildEnvironment">Build Environment</a></li>
-                        <li><a href="#/Login">Login</a></li>
+                        <!--<li><a href="#/Login">Login</a></li>-->
+                        <li ng-show="User ==null"><a href="#/Login">Login</a></li>
+                        <li ng-show="User !=null" class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Hi {{User}}</a>
+                            <ul id="Logout" class="dropdown-menu" role="menu">
+                                <li><a  href="#/Logout">Log out</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
@@ -46,10 +53,14 @@
     <script src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="lib/angular/angular.min.js"></script>
     <script src="lib/angular-route/angular-route.min.js"></script>
-   <script src="js/app.js"></script>
+    <!--<script src="js/app.js"></script>-->
+    <script src="js/app.min.js"></script>
      <!--<script src="js/controllers/authController.js"></script>
-    <script src="js/controllers/homeController.js"></script>-->
-    <script src="js/controllers/controllers.min.js"></script>
+    <script src="js/controllers/homeController.js"></script>
+    <script src="js/controllers/buildController.js"></script>
+    <script src="js/services/httpGetServices.js"></script>
+    <script src="js/services/messages.js"></script>-->
+    <!--<script src="js/controllers/controllers.min.js"></script>-->
    
 
 </body>
