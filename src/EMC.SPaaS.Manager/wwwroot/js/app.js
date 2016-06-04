@@ -8,10 +8,7 @@
             console.log('Success: ' + docs.data.UserName);
             $rootScope.User = docs.data.UserName
         }, function () {
-            $scope.message = {
-                status: messages.danger,
-                details: "Login pending"
-            }
+           
         });
     }])
 
