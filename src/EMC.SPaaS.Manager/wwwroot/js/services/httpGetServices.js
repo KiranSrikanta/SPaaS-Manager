@@ -4,15 +4,19 @@ app.factory("httpGetService", ['$q', '$http', '$rootScope','$cookies', function 
 
     //var authorizationValue = 'Bearer ' + document.cookie.substring(14, document.cookie.length).toString();
     var authorizationValue;
-    if ($cookies.get("Authorization") != null) {
-        authorizationValue = 'Bearer ' + $cookies.get("Authorization");
+    var getAuthorizationValue = function () {
+        if ($cookies.get("Authorization") != null && $cookies.get("Authorization") != undefined) {
+            authorizationValue = 'Bearer ' + $cookies.get("Authorization");
+        }
+        else {
+            authorizationValue = ""
+        }
     }
-    
-
-
+   
     function getMe() {
         var deferred = $q.defer();
-        if (authorizationValue !== undefined) {
+        getAuthorizationValue();
+        if (authorizationValue !== undefined && authorizationValue !== "") {
             var req = {
                 method: 'GET',
                 url: '/api/me',
